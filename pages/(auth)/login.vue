@@ -1,3 +1,4 @@
+<!-- pages/(auth)/login.vue -->
 <script setup lang="ts">
 definePageMeta({
   layout: 'blank',
@@ -5,17 +6,20 @@ definePageMeta({
 </script>
 
 <template>
-  <LayoutAuth reverse>
-    <div class="grid mx-auto max-w-sm gap-6">
-      <div class="grid gap-2 text-center">
-        <h1 class="text-2xl font-semibold tracking-tight">
-          欢迎回来
-        </h1>
-        <p class="text-balance text-sm text-muted-foreground">
-          可以使用统一账户
-        </p>
+  <div class="flex flex-col items-center justify-center gap-6 bg-muted p-6 min-h-svh md:p-10">
+    <div class="max-w-sm w-full flex flex-col gap-6">
+      <div class="flex flex-col gap-6">
+        <Card>
+          <CardHeader class="text-center">
+            <CardTitle class="text-xl">
+              KMS密钥管理系统
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AuthSignIn />
+          </CardContent>
+        </Card>
       </div>
-      <AuthSignIn />
     </div>
-  </LayoutAuth>
+  </div>
 </template>

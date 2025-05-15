@@ -22,6 +22,7 @@ const credentialsSchema = z.object({
 
 export default eventHandler(async (event) => {
   const result = credentialsSchema.safeParse(await readBody(event))
+  console.log('credentials', result)
   if (!result.success) {
     throw createError({
       statusCode: 403,
