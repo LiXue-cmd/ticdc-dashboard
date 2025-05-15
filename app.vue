@@ -26,7 +26,7 @@ useHead({
   },
 })
 
-const title = '医立方数据管理系统'
+const title = 'KMS密钥管理系统'
 const description = 'This dashboard, built with Nuxt, Shadcn UI, and UnoCSS. It includes a dark mode toggle and is optimized for performance and data efficiency.'
 
 useSeoMeta({
@@ -54,7 +54,7 @@ const dir = computed(() => textDirection.value === 'rtl' ? 'rtl' : 'ltr')
         <NuxtPage />
       </NuxtLayout>
 
-      <AppSettings />
+      <!-- <AppSettings /> -->
     </div>
 
     <Toaster />

@@ -3,6 +3,7 @@ import type { NavGroup, NavLink, NavSectionTitle } from '~/types/nav'
 import { navMenu, navMenuBottom } from '~/constants/menus'
 
 function resolveNavItemComponent(item: NavLink | NavGroup | NavSectionTitle): any {
+  console.log('item', item)
   if ('children' in item)
     return resolveComponent('LayoutSidebarNavGroup')
 
@@ -43,7 +44,7 @@ const { sidebar } = useAppSettings()
   <Sidebar :collapsible="sidebar.collapsible" :side="sidebar.side" :variant="sidebar.variant">
     <SidebarHeader>
       <LayoutSidebarNavHeader :teams="teams" />
-      <Search />
+      <!-- <Search /> -->
     </SidebarHeader>
     <SidebarContent>
       <SidebarGroup v-for="(nav, indexGroup) in navMenu" :key="indexGroup">

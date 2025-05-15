@@ -25,7 +25,7 @@ export const navMenu: NavMenu[] = [
     heading: 'Pages',
     items: [
       {
-        title: 'Authentication',
+        title: '身份验证',
         icon: 'i-lucide-lock-keyhole-open',
         children: [
           {
@@ -51,7 +51,7 @@ export const navMenu: NavMenu[] = [
         ],
       },
       {
-        title: 'Errors',
+        title: '报错提示页',
         icon: 'i-lucide-triangle-alert',
         children: [
           {
@@ -82,7 +82,7 @@ export const navMenu: NavMenu[] = [
         ],
       },
       {
-        title: 'Settings',
+        title: '设置',
         icon: 'i-lucide-settings',
         new: true,
         children: [
@@ -119,7 +119,7 @@ export const navMenu: NavMenu[] = [
     heading: 'Components',
     items: [
       {
-        title: 'Components',
+        title: '组件',
         icon: 'i-lucide-component',
         children: [
           {

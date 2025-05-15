@@ -16,22 +16,22 @@ async function onSubmit(event: Event) {
   <form @submit="onSubmit">
     <div class="grid gap-4">
       <div class="grid gap-2">
-        <Label for="email">
-          Email
+        <Label for="username">
+          账号
         </Label>
         <Input
-          id="email"
-          placeholder="name@example.com"
-          type="email"
+          id="username"
+          placeholder="请输入账号"
+          type="text"
           auto-capitalize="none"
-          auto-complete="email"
+          auto-complete="username"
           auto-correct="off"
           :disabled="isLoading"
         />
       </div>
       <Button :disabled="isLoading">
         <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
-        Submit
+        提交
       </Button>
     </div>
   </form>
