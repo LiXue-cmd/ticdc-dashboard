@@ -1,24 +1,42 @@
 <script setup lang="ts">
 import { Loader2 } from "lucide-vue-next";
 import PasswordInput from "~/components/PasswordInput.vue";
-import axios from "~/utils/axios";
+// import axios from "~/utils/axios";
+const { $auth } = useNuxtApp();
+const router = useRouter();
 
 const username = ref("admin");
 const password = ref("admin");
 const isLoading = ref(false);
 
-async function onSubmit(event: Event) {
-  event.preventDefault();
-  if (!username.value || !password.value) return;
-  const res = await axios.post("/auth/login", {
-    username: username.value,
-    password: password.value,
-  });
-  console.log('res',res)
-  localStorage.setItem("accessToken", res.data.accessToken);
-  localStorage.setItem("refreshToken", res.data.refreshToken);
-  navigateTo("/");
-}
+// async function onSubmit(event: Event) {
+//   event.preventDefault();
+//   if (!username.value || !password.value) return;
+//   const res = await axios.post("/auth/login", {
+//     username: username.value,
+//     password: password.value,
+//   });
+//   console.log('res',res)
+//   localStorage.setItem("accessToken", res.data.accessToken);
+//   localStorage.setItem("refreshToken", res.data.refreshToken);
+//   navigateTo("/");
+// }
+const onSubmit = async () => {
+  isLoading.value = true;
+  try {
+    await $auth.loginWith("local", {
+      username: username.value,
+      password: password.value,
+    });
+
+    router.push("/");
+  } catch (e: any) {
+    isLoading.value = false;
+    error.value = e.message || "登录失败，请检查凭证";
+  } finally {
+    isLoading.value = false;
+  }
+};
 </script>
 
 <template>

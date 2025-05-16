@@ -1,21 +1,27 @@
 <script setup lang="ts">
-import { useSidebar } from '~/components/ui/sidebar'
+import { useSidebar } from "~/components/ui/sidebar";
+
+const { $auth } = useNuxtApp();
+const user = computed(() => $auth.user as User);
 
 defineProps<{
   user: {
-    name: string
-    email: string
-    avatar: string
-  }
-}>()
+    name: string;
+    email: string;
+    avatar: string;
+  };
+}>();
 
-const { isMobile, setOpenMobile } = useSidebar()
+const { isMobile, setOpenMobile } = useSidebar();
 
-function handleLogout() {
-  navigateTo('/login')
-}
-
-const showModalTheme = ref(false)
+// function handleLogout() {
+//   navigateTo('/login')
+// }
+const handleLogout = async () => {
+  await $auth.logout();
+  navigateTo("/login");
+};
+const showModalTheme = ref(false);
 </script>
 
 <template>
@@ -30,7 +36,12 @@ const showModalTheme = ref(false)
             <Avatar class="h-8 w-8 rounded-lg">
               <AvatarImage :src="user.avatar" :alt="user.name" />
               <AvatarFallback class="rounded-lg">
-                {{ user.name.split(' ').map((n) => n[0]).join('') }}
+                {{
+                  user.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                }}
               </AvatarFallback>
             </Avatar>
             <div class="grid flex-1 text-left text-sm leading-tight">
@@ -50,7 +61,12 @@ const showModalTheme = ref(false)
               <Avatar class="h-8 w-8 rounded-lg">
                 <AvatarImage :src="user.avatar" :alt="user.name" />
                 <AvatarFallback class="rounded-lg">
-                  {{ user.name.split(' ').map((n) => n[0]).join('') }}
+                  {{
+                    user.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                  }}
                 </AvatarFallback>
               </Avatar>
               <div class="grid flex-1 text-left text-sm leading-tight">
@@ -84,7 +100,11 @@ const showModalTheme = ref(false)
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem as-child>
-              <NuxtLink to="https://github.com/dianprata/nuxt-shadcn-dashboard" external target="_blank">
+              <NuxtLink
+                to="https://github.com/dianprata/nuxt-shadcn-dashboard"
+                external
+                target="_blank"
+              >
                 <Icon name="i-lucide-github" />
                 Github Repository
               </NuxtLink>
@@ -95,6 +115,22 @@ const showModalTheme = ref(false)
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
+
+          <!-- 只有管理员可以看到的内容 -->
+          <Can ability="isAdmin">
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+              <p class="font-bold">管理员功能</p>
+              <p>您可以访问管理控制面板和用户管理功能。</p>
+            </div>
+          </Can>
+          <!-- 只有拥有特定权限的用户可以看到的内容 -->
+          <Can ability="hasPermission" :args="['view-dashboard']">
+            <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-6">
+              <p class="font-bold">数据概览</p>
+              <p>这里显示系统关键指标和统计数据。</p>
+            </div>
+          </Can>
+
           <DropdownMenuItem @click="handleLogout">
             <Icon name="i-lucide-log-out" />
             Log out
@@ -117,6 +153,4 @@ const showModalTheme = ref(false)
   </Dialog>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

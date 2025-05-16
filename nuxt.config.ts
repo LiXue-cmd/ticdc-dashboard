@@ -11,7 +11,39 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@nuxtjs/color-mode',
     'nuxt-codemirror',
+    '@nuxtjs/auth-next',
+    'nuxt-authorization'
   ],
+
+  // 认证配置
+  auth: {
+    strategies: {
+      local: {
+        endpoints: {
+          login: { url: '/api/auth/login', method: 'post' },
+          logout: { url: '/api/auth/logout', method: 'post' },
+          user: { url: '/api/auth/user', method: 'get' }
+        },
+        token: {
+          property: 'token',
+          global: true,
+          required: true,
+          type: 'Bearer'
+        },
+        user: {
+          property: false
+        }
+      }
+    }
+  },
+  
+  // 权限配置
+  authorization: {
+    roles: {
+      admin: ['manage-users', 'view-dashboard'],
+      user: ['view-profile']
+    }
+  },
 
   css: [
     '@unocss/reset/tailwind.css',

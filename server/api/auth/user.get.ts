@@ -1,30 +1,21 @@
-import { Buffer } from 'node:buffer'
-
-export default eventHandler((event) => {
-  const authorizationHeader = getRequestHeader(event, 'Authorization')
-  if (typeof authorizationHeader === 'undefined') {
-    throw createError({ statusCode: 403, statusMessage: 'Need to pass valid Bearer-authorization header to access this endpoint' })
-  }
-
-  // 解析 basic auth header
-  const [type, token] = authorizationHeader.split(' ')
-  if (type !== 'Basic' || !token) {
-    throw createError({ statusCode: 403, statusMessage: 'Need to pass valid Bearer-authorization header to access this endpoint' })
-  }
-
-  // Extract username and password from base64 token
-  const [username, password] = Buffer.from(token, 'base64').toString().split(':')
-
-  if (username !== 'admin' || password !== 'admin') {
+// server/api/auth/user.get.ts
+export default defineEventHandler((event) => {
+  const token = getCookie(event, 'auth_token');
+  
+  // 验证 token (实际项目中应使用 JWT 库验证)
+  if (!token || token !== 'fake-jwt-token') {
     throw createError({
       statusCode: 401,
-      statusMessage: 'Unauthorized, user is not logged in',
-    })
+      message: '未授权'
+    });
   }
-
-  // All checks successful
+  
+  // 返回用户信息
   return {
-    name: username,
+    id: 1,
+    name: 'Admin User',
+    email: 'admin@example.com',
     role: 'admin',
-  }
-})
+    permissions: ['manage-users', 'view-dashboard']
+  };
+});

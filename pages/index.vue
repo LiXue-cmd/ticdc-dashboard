@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import NumberFlow from '@number-flow/vue'
 import { Activity, CreditCard, DollarSign, Users } from 'lucide-vue-next'
+import NewNavigationMenu from '~/components/ui/navigation-menu/NewNavigationMenu.vue'
 
 const dataCard = ref({
   totalRevenue: 0,
@@ -57,6 +58,9 @@ onMounted(() => {
 
 <template>
   <div class="w-full flex flex-col gap-4">
+    
+    <NewNavigationMenu />
+
     <div class="flex flex-wrap items-center justify-between gap-2">
       <h2 class="text-2xl font-bold tracking-tight">
         Dashboard
