@@ -64,6 +64,7 @@
     "codemirror-json5": "^1.0.3",
     "embla-carousel": "^8.5.2",
     "embla-carousel-vue": "^8.5.2",
+    "jsonwebtoken": "^9.0.2",
     "nuxt-codemirror": "^0.0.16"
   },
   "devDependencies": {

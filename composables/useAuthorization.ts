@@ -1,12 +1,12 @@
 // composables/useAuthorization.ts
 import { useState } from '#app'
-// import { computed, Ref } from 'vue'
 import type { Ref } from 'vue'
 
 interface User {
   id: number,
-  name: string,
+  // name: string,
   username: string,
+  password: string,
   role: string,
   permissions: string[],
 }
