@@ -1,39 +1,34 @@
 // utils/axios.ts
 import axios from 'axios';
-// 引入 useAuthorization
 import { useAuthorization } from '~/composables/useAuthorization';
 
-
 const instance = axios.create({
-  // baseURL: 'http://localhost:3000/api',
   baseURL: '/api',
   timeout: 10000
 });
 
 instance.interceptors.request.use(config => {
-  const token = localStorage.getItem('accessToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  console.log('Request headers:', config.headers);
   return config;
+}, error => {
+  return Promise.reject(error);
 });
 
 instance.interceptors.response.use(
   response => {
     console.log('Response headers:', response.headers);
-    // response.headers['content-type'] = 'application/json';
     return response;
   },
   error => {
     console.error('Axios response error:', error);
 
     if (error.response?.status === 401) {
-      // 可以在这里添加自动登出逻辑
-      const { clearUser } = useAuthorization(); // 假设 useAuthorization 提供 clearUser 方法
+      const { clearUser } = useAuthorization();
       clearUser();
     }
-    alert(error.response.data.message)
-    // return Promise.reject(error.response.data);
+    alert(error.response.data.message);
+    return Promise.reject(error);
   }
 );
+
 export default instance;

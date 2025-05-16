@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useSidebar } from '~/components/ui/sidebar'
+// import { useAuth } from '#auth'
 
 defineProps<{
   user: {
@@ -10,8 +11,10 @@ defineProps<{
 }>()
 
 const { isMobile, setOpenMobile } = useSidebar()
+const { logout } = useAuth(); // 解构出 logout 方法（无需重新声明）
 
 function handleLogout() {
+  logout(); // 调用 nuxt-auth 提供的 logout 方法
   navigateTo('/login')
 }
 

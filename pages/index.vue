@@ -2,6 +2,8 @@
 import NumberFlow from '@number-flow/vue'
 import { Activity, CreditCard, DollarSign, Users } from 'lucide-vue-next'
 
+const { auth } = useAuth(); // 获取认证状态
+
 const dataCard = ref({
   totalRevenue: 0,
   totalRevenueDesc: 0,
@@ -57,6 +59,17 @@ onMounted(() => {
 
 <template>
   <div class="w-full flex flex-col gap-4">
+
+     <!-- 检查是否为超级管理员 -->
+    <div v-if="auth?.role === 'superAdmin'">
+      <p>这是管理员专属内容</p>
+    </div>
+
+    <!-- 使用 nuxt-authorization 提供的指令（需配置） -->
+    <template v-auth="'superAdmin'">
+      <p>只有超级管理员可见</p>
+    </template>
+    
     <div class="flex flex-wrap items-center justify-between gap-2">
       <h2 class="text-2xl font-bold tracking-tight">
         Dashboard
@@ -82,7 +95,7 @@ onMounted(() => {
                 :format="{ style: 'currency', currency: 'USD', trailingZeroDisplay: 'stripIfInteger' }"
               />
             </div>
-            <p class="text-xs text-muted-foreground">
+            <p class="text-xs text-muted-foreground" v-if="process.client">
               <NumberFlow
                 :value="dataCard.totalRevenueDesc"
                 prefix="+"

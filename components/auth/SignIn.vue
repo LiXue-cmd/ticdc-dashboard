@@ -1,58 +1,53 @@
+<!-- components/auth/SignIn.vue -->
 <script setup lang="ts">
-import { Loader2 } from "lucide-vue-next";
-import PasswordInput from "~/components/PasswordInput.vue";
-import axios from "~/utils/axios";
+const { login, error } = useAuth(); // 引入 nuxt-authorization 的登录方法
+const form = ref<Record<'username' | 'password', string>>({
+  username: 'admin',
+  password: 'admin',
+});
 
-const username = ref("admin");
-const password = ref("admin");
-const isLoading = ref(false);
-
-async function onSubmit(event: Event) {
-  event.preventDefault();
-  if (!username.value || !password.value) return;
-  const res = await axios.post("/auth/login", {
-    username: username.value,
-    password: password.value,
-  });
-  console.log('res',res)
-  localStorage.setItem("accessToken", res.data.accessToken);
-  localStorage.setItem("refreshToken", res.data.refreshToken);
-  navigateTo("/");
-}
+const handleSubmit = async () => {
+  try {
+    // 使用 nuxt-authorization 提供的登录方法
+    await login('local', form.value); // 'local' 对应策略名称
+    navigateTo('/'); // 登录成功跳转首页
+  } catch (err) {
+    console.error('登录失败:', err);
+  }
+};
 </script>
 
 <template>
-  <form class="grid gap-6" @submit="onSubmit">
-    <div class="grid gap-2">
-      <Label for="username"> 账号 </Label>
-      <Input
-        id="username"
-        v-model="username"
-        type="text"
-        placeholder="请输入账号"
-        :disabled="isLoading"
-        auto-capitalize="none"
-        auto-complete="username"
-        auto-correct="off"
-      />
-    </div>
-    <div class="grid gap-2">
-      <div class="flex items-center">
-        <Label for="password"> 密码 </Label>
-        <NuxtLink
-          to="/forgot-password"
-          class="ml-auto inline-block text-sm underline"
-        >
-          忘记密码?
-        </NuxtLink>
+  <form @submit.prevent="handleSubmit" class="grid gap-6">
+    <div>
+      <label class="block text-sm font-medium text-gray-700">用户名</label>
+      <div class="mt-1">
+        <input
+          v-model="form.username"
+          type="text"
+          class="appearance-none block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+        />
       </div>
-      <PasswordInput id="password" v-model="password" />
     </div>
-    <Button type="submit" class="w-full" :disabled="isLoading">
-      <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
-      登 录
-    </Button>
+    <div>
+      <label class="block text-sm font-medium text-gray-700">密码</label>
+      <div class="mt-1">
+        <input
+          v-model="form.password"
+          type="password"
+          class="appearance-none block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+        />
+      </div>
+    </div>
+    <button
+      type="submit"
+      class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
+    >
+      登录
+    </button>
+    <!-- 错误提示 -->
+    <div v-if="error.value" class="text-red-500 text-sm mt-2">
+      {{ error.value.message || '登录失败，请检查凭证' }}
+    </div>
   </form>
 </template>
-
-<style scoped></style>
