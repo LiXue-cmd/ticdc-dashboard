@@ -1,17 +1,3 @@
-// 示例：composables/useAuthorization.ts
-// export const useAuthorization = () => {
-//     // 实现授权逻辑
-//     const isAuthenticated = ref(false);
-
-//     const login = () => {
-//         // 登录逻辑
-//     };
-
-//     return {
-//         isAuthenticated,
-//         login,
-//     };
-// };
 // composables/useAuthorization.ts
 import { useState } from '#app'
 // import { computed, Ref } from 'vue'

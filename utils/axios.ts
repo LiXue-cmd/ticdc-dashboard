@@ -29,8 +29,8 @@ instance.interceptors.response.use(
       const { clearUser } = useAuthorization(); // 假设 useAuthorization 提供 clearUser 方法
       clearUser();
     }
-
-    return Promise.reject(error);
+    alert(error.response.data.message)
+    // return Promise.reject(error.response.data);
   }
 );
 export default instance;
