@@ -55,6 +55,7 @@
     "@internationalized/date": "^3.7.0",
     "@lezer/common": "^1.2.3",
     "@number-flow/vue": "^0.4.5",
+    "@nuxtjs/axios": "^5.13.6",
     "@tanstack/vue-table": "^8.21.2",
     "@unovis/ts": "^1.5.1",
     "@unovis/vue": "^1.5.1",
@@ -65,6 +66,7 @@
     "embla-carousel": "^8.5.2",
     "embla-carousel-vue": "^8.5.2",
     "jsonwebtoken": "^9.0.2",
+    "nuxt-authorization": "^0.3.4",
     "nuxt-codemirror": "^0.0.16"
   },
   "devDependencies": {
