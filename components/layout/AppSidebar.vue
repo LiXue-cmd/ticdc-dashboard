@@ -3,7 +3,7 @@ import type { NavGroup, NavLink, NavSectionTitle } from '~/types/nav'
 import { navMenu, navMenuBottom } from '~/constants/menus'
 
 function resolveNavItemComponent(item: NavLink | NavGroup | NavSectionTitle): any {
-  console.log('item', item)
+  // console.log('item', item)
   if ('children' in item)
     return resolveComponent('LayoutSidebarNavGroup')
 

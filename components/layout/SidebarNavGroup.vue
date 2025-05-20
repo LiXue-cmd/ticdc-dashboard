@@ -42,6 +42,8 @@ const openCollapsible = ref(false)
             >
               <SidebarMenuSubButton as-child>
                 <NuxtLink :to="subItem.link" @click="setOpenMobile(false)">
+                  <!-- 增加显示的图标 -->
+                  <Icon :name="subItem.icon || ''" mode="svg" />
                   <span>{{ subItem.title }}</span>
                   <span v-if="subItem.new" class="rounded-md bg-#adfa1d px-1.5 py-0.5 text-xs text-black leading-none no-underline group-hover:no-underline">
                     New

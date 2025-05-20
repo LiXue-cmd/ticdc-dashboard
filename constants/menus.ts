@@ -2,118 +2,201 @@ import type { NavMenu, NavMenuItems } from '~/types/nav'
 
 export const navMenu: NavMenu[] = [
   {
-    heading: '管理',
+    heading: '',
     items: [
       {
-        title: '监控',
+        title: '首页',
         icon: 'i-lucide-home',
-        link: '/',
+        link: '/'
       },
-      {
-        title: '任务',
-        icon: 'i-lucide-calendar-check-2',
-        link: '/tasks',
-      },
-      {
-        title: '日志',
-        icon: 'i-lucide-mail',
-        link: '/email',
-      },
+      // {
+      //   title: '任务',
+      //   icon: 'i-lucide-calendar-check-2',
+      //   link: '/tasks',
+      // },
+      // {
+      //   title: '日志',
+      //   icon: 'i-lucide-mail',
+      //   link: '/email',
+      // },
     ],
   },
   {
-    heading: 'Pages',
+    heading: '密码管理',
     items: [
       {
-        title: '身份验证',
-        icon: 'i-lucide-lock-keyhole-open',
-        children: [
-          {
-            title: 'Login',
-            icon: 'i-lucide-circle',
-            link: '/login',
-          },
-          {
-            title: 'Login Basic',
-            icon: 'i-lucide-circle',
-            link: '/login-basic',
-          },
-          {
-            title: 'Register',
-            icon: 'i-lucide-circle',
-            link: '/register',
-          },
-          {
-            title: 'Forgot Password',
-            icon: 'i-lucide-circle',
-            link: '/forgot-password',
-          },
-        ],
+        title: '主密钥管理',
+        icon: 'i-lucide-file-lock',
+        link: '/password/masterKeyManage',
       },
       {
-        title: '报错提示页',
-        icon: 'i-lucide-triangle-alert',
-        children: [
-          {
-            title: '401 - Unauthorized',
-            icon: 'i-lucide-circle',
-            link: '/401',
-          },
-          {
-            title: '403 - Forbidden',
-            icon: 'i-lucide-circle',
-            link: '/403',
-          },
-          {
-            title: '404 - Not Found',
-            icon: 'i-lucide-circle',
-            link: '/404',
-          },
-          {
-            title: '500 - Internal Server Error',
-            icon: 'i-lucide-circle',
-            link: '/500',
-          },
-          {
-            title: '503 - Service Unavailable',
-            icon: 'i-lucide-circle',
-            link: '/503',
-          },
-        ],
+        title: '数据密钥管理',
+        icon: 'i-lucide-key',
+        link: '/password/dataKeyManage'
       },
       {
-        title: '设置',
-        icon: 'i-lucide-settings',
-        new: true,
-        children: [
-          {
-            title: 'Profile',
-            icon: 'i-lucide-circle',
-            link: '/settings/profile',
-          },
-          {
-            title: 'Account',
-            icon: 'i-lucide-circle',
-            link: '/settings/account',
-          },
-          {
-            title: 'Appearance',
-            icon: 'i-lucide-circle',
-            link: '/settings/appearance',
-          },
-          {
-            title: 'Notifications',
-            icon: 'i-lucide-circle',
-            link: '/settings/notifications',
-          },
-          {
-            title: 'Display',
-            icon: 'i-lucide-circle',
-            link: '/settings/display',
-          },
-        ],
+        title: '密钥别名管理',
+        icon: 'i-lucide-rectangle-ellipsis',
+        link: '/password/keyAliasManage'
       },
+      // {
+      //   title: '身份验证',
+      //   icon: 'i-lucide-lock-keyhole-open',
+      //   children: [
+      //     {
+      //       title: 'Login',
+      //       icon: 'i-lucide-circle',
+      //       link: '/login',
+      //     },
+      //     {
+      //       title: 'Login Basic',
+      //       icon: 'i-lucide-circle',
+      //       link: '/login-basic',
+      //     },
+      //     {
+      //       title: 'Register',
+      //       icon: 'i-lucide-circle',
+      //       link: '/register',
+      //     },
+      //     {
+      //       title: 'Forgot Password',
+      //       icon: 'i-lucide-circle',
+      //       link: '/forgot-password',
+      //     },
+      //   ],
+      // },
+      // {
+      //   title: '报错提示页',
+      //   icon: 'i-lucide-triangle-alert',
+      //   children: [
+      //     {
+      //       title: '401 - Unauthorized',
+      //       icon: 'i-lucide-circle',
+      //       link: '/401',
+      //     },
+      //     {
+      //       title: '403 - Forbidden',
+      //       icon: 'i-lucide-circle',
+      //       link: '/403',
+      //     },
+      //     {
+      //       title: '404 - Not Found',
+      //       icon: 'i-lucide-circle',
+      //       link: '/404',
+      //     },
+      //     {
+      //       title: '500 - Internal Server Error',
+      //       icon: 'i-lucide-circle',
+      //       link: '/500',
+      //     },
+      //     {
+      //       title: '503 - Service Unavailable',
+      //       icon: 'i-lucide-circle',
+      //       link: '/503',
+      //     },
+      //   ],
+      // },
+      // {
+      //   title: '设置',
+      //   icon: 'i-lucide-settings',
+      //   new: true,
+      //   children: [
+      //     {
+      //       title: 'Profile',
+      //       icon: 'i-lucide-circle',
+      //       link: '/settings/profile',
+      //     },
+      //     {
+      //       title: 'Account',
+      //       icon: 'i-lucide-circle',
+      //       link: '/settings/account',
+      //     },
+      //     {
+      //       title: 'Appearance',
+      //       icon: 'i-lucide-circle',
+      //       link: '/settings/appearance',
+      //     },
+      //     {
+      //       title: 'Notifications',
+      //       icon: 'i-lucide-circle',
+      //       link: '/settings/notifications',
+      //     },
+      //     {
+      //       title: 'Display',
+      //       icon: 'i-lucide-circle',
+      //       link: '/settings/display',
+      //     },
+      //   ],
+      // },
     ],
+  },
+  {
+    heading: '',
+    items: [
+      {
+        title: '标签管理',
+        icon: 'i-lucide-tag',
+        link: '/labelManage',
+      }]
+  },
+  {
+    heading: '',
+    items: [
+      {
+        title: '应用管理',
+        icon: 'i-lucide-layout-grid',
+        link: '/appManage',
+      }]
+  },
+  {
+    heading: '',
+    items: [
+      {
+        title: '日志',
+        icon: 'i-lucide-logs',
+        children: [
+          {
+            title: '操作日志',
+            icon: 'i-lucide-handshake',
+            link: '/logs/operationLog',
+          },
+          {
+            title: '接口日志',
+            icon: 'i-lucide-cable',
+            link: '/logs/interfaceLog',
+          }
+        ]
+      }]
+  },
+  {
+    heading: '',
+    items: [
+      {
+        title: '系统配置',
+        icon: 'i-lucide-bolt',
+        children: [
+          {
+            title: '用户管理',
+            icon: 'i-lucide-circle',
+            link: '/systemConfig/userManage',
+          },
+          {
+            title: '数据备份',
+            icon: 'i-lucide-user',
+            link: '/systemConfig/dataBackup',
+          },
+          {
+            title: '系统根密钥轮换',
+            icon: 'i-lucide-refresh-ccw',
+            link: '/systemConfig/rootKeyRotation',
+          },
+          {
+            title: '加密设备配置',
+            icon: 'i-lucide-monitor-cog',
+            link: '/systemConfig/encryDeviceConfig',
+          }
+        ]
+      }]
   },
   {
     heading: 'Components',
