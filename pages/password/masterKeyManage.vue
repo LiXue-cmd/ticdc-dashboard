@@ -17,13 +17,29 @@
             class="px-6 py-3 text-center text-sm font-semibold text-gray-500"
             >密钥别名</TableHead
           >
-          
+          <TableHead
+            class="px-6 py-3 text-center text-sm font-semibold text-gray-500"
+            >算法</TableHead
+          >
+          <TableHead
+            class="px-6 py-3 text-center text-sm font-semibold text-gray-500"
+            >标签</TableHead
+          >
+          <TableHead
+            class="px-6 py-3 text-center text-sm font-semibold text-gray-500"
+            >备注说明</TableHead
+          >
           <TableHead
             class="px-6 py-3 text-center text-sm font-semibold text-gray-500"
             >创建日期</TableHead
-          ><TableHead
+          >
+          <TableHead
             class="px-6 py-3 text-center text-sm font-semibold text-gray-500"
-            >更新日期</TableHead
+            >版本</TableHead
+          >
+          <TableHead
+            class="px-6 py-3 text-center text-sm font-semibold text-gray-500"
+            >状态</TableHead
           >
           <!-- 操作列保持右对齐（text-right） -->
           <TableHead
@@ -47,11 +63,27 @@
             item.keyAlias || "-"
           }}</TableCell>
           <TableCell class="px-6 py-4 text-center font-medium">{{
+            item.algorithm || "-"
+          }}</TableCell>
+          <TableCell class="px-6 py-4 text-center font-medium">{{
+            item.tags || "-"
+          }}</TableCell>
+          <TableCell class="px-6 py-4 text-center font-medium">{{
+            item.notes || "-"
+          }}</TableCell>
+          <TableCell class="px-6 py-4 text-center font-medium">{{
             item.createDate || "-"
           }}</TableCell>
           <TableCell class="px-6 py-4 text-center font-medium">{{
-            item.updateDate || "-"
+            item.version || "-"
           }}</TableCell>
+          <!-- 状态列若包含开关组件，建议居中对齐 -->
+          <TableCell class="px-6 py-4 text-center">
+            <Switch
+              :checked="item.status === 'active'"
+              @update:checked="toggleStatus(item)"
+            />
+          </TableCell>
           <!-- 操作列按钮保持右对齐 -->
           <TableCell class="px-6 py-4 text-right">
             <button
@@ -206,8 +238,8 @@
         </div>
 
         <div class="flex justify-end mt-6">
-          <Button variant="outline" @click="closeCreateModal"> 取消 </Button>
-          <Button type="button" style="margin-left: 10px" @click="createKey"
+          <Button variant="outline" @click="closeCreateModal" class="mr-2"> 取消 </Button>
+          <Button type="button" @click="createKey"
             >创建</Button
           >
         </div>
@@ -223,8 +255,14 @@ const invoices = ref([
   {
     invoice: "INV001",
     keyAlias: "订单支付密钥",
+    algorithm: "对称密钥",
+    tags: "支付,订单",
+    notes: "用于订单支付加密",
     createDate: "2023-06-15",
-    updateDate: "2023-06-15",
+    version: "v1.0",
+    status: "active", // 状态字段
+    totalAmount: "$250.00",
+    paymentMethod: "Credit Card",
   },
 ]);
 // 模态框状态

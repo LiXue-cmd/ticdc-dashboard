@@ -1,51 +1,18 @@
 <template>
   <div class="flex justify-between items-center mb-4">
     <Button variant="outline" @click="openCreateModal">
-      <Icon name="i-lucide-plus" mode="svg" /> 新增密钥
+      <Icon name="i-lucide-plus" mode="svg" /> 新增密钥别名
     </Button>
   </div>
   <div class="overflow-x-auto bg-white rounded-lg shadow-md">
     <Table class="min-w-full table-fixed">
       <TableHeader>
         <TableRow>
-          <!-- 表头所有列添加 text-center 类名（操作列保持右对齐） -->
-          <TableHead
-            class="px-6 py-3 text-center text-sm font-semibold text-gray-500 w-24"
-            >密钥ID</TableHead
-          >
-          <TableHead
-            class="px-6 py-3 text-center text-sm font-semibold text-gray-500"
-            >密钥别名</TableHead
-          >
-          <TableHead
-            class="px-6 py-3 text-center text-sm font-semibold text-gray-500"
-            >算法</TableHead
-          >
-          <TableHead
-            class="px-6 py-3 text-center text-sm font-semibold text-gray-500"
-            >标签</TableHead
-          >
-          <TableHead
-            class="px-6 py-3 text-center text-sm font-semibold text-gray-500"
-            >备注说明</TableHead
-          >
-          <TableHead
-            class="px-6 py-3 text-center text-sm font-semibold text-gray-500"
-            >创建日期</TableHead
-          >
-          <TableHead
-            class="px-6 py-3 text-center text-sm font-semibold text-gray-500"
-            >版本</TableHead
-          >
-          <TableHead
-            class="px-6 py-3 text-center text-sm font-semibold text-gray-500"
-            >状态</TableHead
-          >
-          <!-- 操作列保持右对齐（text-right） -->
-          <TableHead
-            class="px-6 py-3 text-right text-sm font-semibold text-gray-500"
-            >操作</TableHead
-          >
+          <TableHead class="px-6 py-3 text-center text-sm font-semibold text-gray-500 w-24">密钥ID</TableHead>
+          <TableHead class="px-6 py-3 text-center text-sm font-semibold text-gray-500">密钥别名</TableHead>
+          <TableHead class="px-6 py-3 text-center text-sm font-semibold text-gray-500">创建日期</TableHead>
+          <TableHead class="px-6 py-3 text-center text-sm font-semibold text-gray-500">更新日期</TableHead>
+          <TableHead class="px-6 py-3 text-right text-sm font-semibold text-gray-500">操作</TableHead>
         </TableRow>
       </TableHeader>
 
@@ -55,294 +22,200 @@
           :key="item.invoice"
           class="hover:bg-gray-50"
         >
-          <!-- 表体所有列添加 text-center 类名（操作列保持右对齐） -->
-          <TableCell class="px-6 py-4 text-center font-medium">{{
-            item.invoice
-          }}</TableCell>
-          <TableCell class="px-6 py-4 text-center font-medium">{{
-            item.keyAlias || "-"
-          }}</TableCell>
-          <TableCell class="px-6 py-4 text-center font-medium">{{
-            item.algorithm || "-"
-          }}</TableCell>
-          <TableCell class="px-6 py-4 text-center font-medium">{{
-            item.tags || "-"
-          }}</TableCell>
-          <TableCell class="px-6 py-4 text-center font-medium">{{
-            item.notes || "-"
-          }}</TableCell>
-          <TableCell class="px-6 py-4 text-center font-medium">{{
-            item.createDate || "-"
-          }}</TableCell>
-          <TableCell class="px-6 py-4 text-center font-medium">{{
-            item.version || "-"
-          }}</TableCell>
-          <!-- 状态列若包含开关组件，建议居中对齐 -->
-          <TableCell class="px-6 py-4 text-center">
-            <Switch
-              :checked="item.status === 'active'"
-              @update:checked="toggleStatus(item)"
-            />
-          </TableCell>
-          <!-- 操作列按钮保持右对齐 -->
+          <TableCell class="px-6 py-4 text-center font-medium">{{ item.invoice }}</TableCell>
+          <TableCell class="px-6 py-4 text-center font-medium">{{ item.keyAlias || "-" }}</TableCell>
+          <TableCell class="px-6 py-4 text-center font-medium">{{ item.createDate || "-" }}</TableCell>
+          <TableCell class="px-6 py-4 text-center font-medium">{{ item.updateDate || "-" }}</TableCell>
           <TableCell class="px-6 py-4 text-right">
+            <button @click="openAssociateModal(item)"
+              class="text-blue-600 hover:text-blue-800 mr-2">关联密码</button>
             <button
-              @click="openDetailModal(item)"
-              class="text-blue-600 hover:text-blue-800"
+              @click="confirmDelete(item)"
+              class="text-red-600 hover:text-red-800"
             >
-              详情
+              删除
             </button>
           </TableCell>
         </TableRow>
       </TableBody>
     </Table>
   </div>
-  <!-- 详情弹窗 @open-change="closeDetailModal" -->
-  <Dialog :open="isDetailModalOpen">
-    <DialogTrigger asChild>
-      <template #trigger></template>
-    </DialogTrigger>
-    <DialogContent class="w-full max-w-2xl">
-      <DialogTitle>查看详情</DialogTitle>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 px-6">
-        <div>
-          <div class="text-sm font-medium text-gray-700">密钥ID</div>
-          <div class="text-gray-800">{{ selectedInvoice.invoice || "-" }}</div>
-        </div>
-        <div>
-          <div class="text-sm font-medium text-gray-700">密钥别名</div>
-          <div class="text-gray-800">{{ selectedInvoice.keyAlias || "-" }}</div>
-        </div>
-        <div>
-          <div class="text-sm font-medium text-gray-700">算法</div>
-          <div class="text-gray-800">
-            {{ selectedInvoice.algorithm || "-" }}
-          </div>
-        </div>
-        <div>
-          <div class="text-sm font-medium text-gray-700">标签</div>
-          <div class="text-gray-800">{{ selectedInvoice.tags || "-" }}</div>
-        </div>
-        <div>
-          <div class="text-sm font-medium text-gray-700">备注说明</div>
-          <div class="text-gray-800">{{ selectedInvoice.notes || "-" }}</div>
-        </div>
-        <div>
-          <div class="text-sm font-medium text-gray-700">创建日期</div>
-          <div class="text-gray-800">
-            {{ selectedInvoice.createDate || "-" }}
-          </div>
-        </div>
-        <div>
-          <div class="text-sm font-medium text-gray-700">版本</div>
-          <div class="text-gray-800">{{ selectedInvoice.version || "-" }}</div>
-        </div>
-        <div>
-          <div class="text-sm font-medium text-gray-700">状态</div>
-          <div class="flex items-center gap-x-2">
-            <span :class="getStatusClass(selectedInvoice.status)">{{
-              getStatusText(selectedInvoice.status)
-            }}</span>
-          </div>
-        </div>
-      </div>
-      <div class="flex justify-end mt-6 px-6">
-        <Button @click="closeDetailModal"> 关闭 </Button>
-      </div>
-    </DialogContent>
-  </Dialog>
 
-  <!-- 新增弹窗 @open-change="closeCreateModal" -->
-  <Dialog :open="isCreateModalOpen">
+  <!-- 新增弹窗（仅密码别名） -->
+  <Dialog :open="isCreateModalOpen" @open-change="closeCreateModal">
     <DialogTrigger asChild>
       <template #trigger></template>
     </DialogTrigger>
-    <DialogContent class="w-full max-w-xl">
-      <DialogTitle class="text-lg font-bold text-gray-800"
-        >新增密钥</DialogTitle
-      >
-      <form class="mt-6 px-6 space-y-4">
+    <DialogContent class="w-full max-w-md">
+      <DialogTitle class="text-lg font-bold text-gray-800">新增密钥别名</DialogTitle>
+      <form @submit.prevent class="mt-6 px-6 space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700"
-            >密钥别名</label
-          >
+          <label class="block text-sm font-medium text-gray-700">密钥别名</label>
           <Input
             type="text"
-            v-model="newKey.keyAlias"
+            v-model="newKeyAlias"
             placeholder="请输入密钥别名"
             class="mt-1 block w-full"
+            required
           />
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">算法</label>
-          <Input
-            type="text"
-            v-model="newKey.algorithm"
-            placeholder="请输入算法"
-            class="mt-1 block w-full"
-          />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700"
-            >密钥类型</label
-          >
-          <RadioGroup
-            default-value="option-one"
-            v-model="newKey.keyType"
-            class="flex flex-row space-x-4"
-          >
-            <div class="flex items-center space-x-2">
-              <RadioGroupItem id="option-one" value="option-one" />
-              <Label for="option-one">对称密钥</Label>
-            </div>
-            <div class="flex items-center space-x-2">
-              <RadioGroupItem id="option-two" value="option-two" />
-              <Label for="option-two">非对称密钥</Label>
-            </div>
-            <div class="flex items-center space-x-2">
-              <RadioGroupItem id="option-three" value="option-three" />
-              <Label for="option-three">HMAC</Label>
-            </div>
-          </RadioGroup>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700">标签</label>
-          <Input
-            type="text"
-            v-model="newKey.tags"
-            placeholder="请输入标签，多个标签用逗号分隔"
-            class="mt-1 block w-full"
-          />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700"
-            >备注说明</label
-          >
-          <Textarea
-            v-model="newKey.notes"
-            placeholder="请输入备注说明"
-            class="mt-1 block w-full h-24"
-          />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">版本</label>
-          <Input
-            type="text"
-            v-model="newKey.version"
-            placeholder="请输入版本"
-            class="mt-1 block w-full"
-          />
-        </div>
-
         <div class="flex justify-end mt-6">
-          <Button variant="outline" @click="closeCreateModal"> 取消 </Button>
-          <Button type="button" style="margin-left: 10px" @click="createKey"
-            >创建</Button
-          >
+          <Button variant="outline" @click="closeCreateModal" class="mr-2">取消</Button>
+          <Button type="primary" @click="handleCreate">创建</Button>
         </div>
       </form>
     </DialogContent>
   </Dialog>
+
+  <!-- 关联密码弹窗（穿梭框） -->
+  <Dialog :open="isAssociateModalOpen" @open-change="closeAssociateModal">
+    <DialogTrigger asChild>
+      <template #trigger></template>
+    </DialogTrigger>
+    <DialogContent class="w-full max-w-3xl">
+      <DialogTitle class="text-lg font-bold text-gray-800">关联密码</DialogTitle>
+      <Transfer
+        :availablePasswords="availablePasswords"
+        :selectedPasswords="currentSelectedPasswords"
+        @update:selectedPasswords="updateSelectedPasswords"
+        class="px-6 py-4"
+      />
+      <div class="flex justify-end mt-6 px-6">
+        <Button variant="outline" @click="closeAssociateModal" class="mr-2">取消</Button>
+        <Button type="primary" @click="saveAssociations">保存</Button>
+      </div>
+    </DialogContent>
+  </Dialog>
+
+  <!-- 删除确认提示框 -->
+  <Dialog :open="isDeleteConfirmOpen">
+    <DialogTrigger asChild>
+      <template #trigger></template>
+    </DialogTrigger>
+    <DialogContent class="w-full max-w-md">
+      <DialogTitle class="text-lg font-bold text-gray-800">删除确认</DialogTitle>
+      <div class="px-6 py-4 text-gray-700">
+        确认删除密钥 <span class="font-medium">{{ deletingItem?.keyAlias || "-" }}</span> 吗？
+      </div>
+      <div class="flex justify-end mt-6 px-6">
+        <Button variant="outline" @click="cancelDelete" class="mr-2">取消</Button>
+        <Button type="destructive" @click="handleDelete">删除</Button>
+      </div>
+    </DialogContent>
+  </Dialog>
 </template>
+
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useToast } from "@/components/ui/toast/use-toast";
+import Transfer from "./Transfer.vue"; // 穿梭框组件
+
 const { toast } = useToast();
+
+// 模拟数据
 const invoices = ref([
   {
     invoice: "INV001",
     keyAlias: "订单支付密钥",
-    algorithm: "对称密钥",
-    tags: "支付,订单",
-    notes: "用于订单支付加密",
     createDate: "2023-06-15",
-    version: "v1.0",
-    status: "active", // 状态字段
-    totalAmount: "$250.00",
-    paymentMethod: "Credit Card",
+    updateDate: "2023-06-15",
+    passwords: [] // 关联的密码ID列表
   },
 ]);
-// 模态框状态
-const isDetailModalOpen = ref(false);
+
+// 新增弹框状态及数据
 const isCreateModalOpen = ref(false);
-const selectedInvoice = ref<any>({});
+const newKeyAlias = ref("");
 
-// 新增表单数据
-const newKey = ref({
-  keyAlias: "",
-  algorithm: "",
-  keyType: "对称密钥",
-  tags: "",
-  notes: "",
-  version: "",
-  status: "active", // 默认启用
-});
-// 状态样式映射
-const getStatusClass = (status: string) => {
-  return {
-    active: "bg-green-100 text-green-800",
-    inactive: "bg-red-100 text-red-800",
-  }[status];
+// 关联密码弹框状态
+const isAssociateModalOpen = ref(false);
+const currentItem = ref(null);
+const availablePasswords = ref([ // 模拟可用密码列表
+  { id: "PWD001", alias: "用户支付密码" },
+  { id: "PWD002", alias: "API访问密码" },
+  { id: "PWD003", alias: "数据库密码" },
+]);
+const currentSelectedPasswords = ref<string[]>([]);
+
+// 删除确认状态
+const isDeleteConfirmOpen = ref(false);
+const deletingItem = ref(null);
+
+// 打开新增弹框
+const openCreateModal = () => {
+  newKeyAlias.value = "";
+  isCreateModalOpen.value = true;
 };
 
-// 状态文本映射
-const getStatusText = (status: string) => {
-  return status === "active" ? "启用" : "禁用";
+// 处理新增
+const handleCreate = () => {
+  const newId = `INV${invoices.value.length + 101}`;
+  invoices.value.unshift({
+    invoice: newId,
+    keyAlias: newKeyAlias.value,
+    createDate: new Date().toISOString().split("T")[0],
+    updateDate: "",
+    passwords: []
+  });
+  closeCreateModal();
+  toast({ description: "新增成功！" });
 };
 
-// 切换状态
-const toggleStatus = (data: any) => {
-  console.log("===", data);
-  data.status = data.status === "active" ? "inactive" : "active";
+// 打开关联密码弹框
+const openAssociateModal = (item) => {
+  currentItem.value = item;
+  currentSelectedPasswords.value = [...item.passwords];
+  isAssociateModalOpen.value = true;
 };
 
-// 打开详情弹窗
-const openDetailModal = (invoice: any) => {
-  selectedInvoice.value = { ...invoice };
-  isDetailModalOpen.value = true;
+// 更新选中密码
+const updateSelectedPasswords = (ids) => {
+  currentSelectedPasswords.value = ids;
 };
 
-// 关闭详情弹窗
-const closeDetailModal = () => {
-  isDetailModalOpen.value = false;
+// 保存关联
+const saveAssociations = () => {
+  if (!currentItem.value) return;
+  currentItem.value.passwords = currentSelectedPasswords.value;
+  currentItem.value.updateDate = new Date().toISOString().split("T")[0];
+  closeAssociateModal();
+  toast({ description: "关联成功！" });
 };
 
-// 关闭详情弹窗
+// 打开删除确认
+const confirmDelete = (item) => {
+  deletingItem.value = item;
+  isDeleteConfirmOpen.value = true;
+};
+
+// 处理删除
+const handleDelete = () => {
+  if (!deletingItem.value) return;
+  invoices.value = invoices.value.filter(item => item.invoice !== deletingItem.value.invoice);
+  closeDeleteConfirm();
+  toast({ 
+    description: "删除成功！",
+    variant: "destructive"
+  });
+};
+
+// 取消删除
+const cancelDelete = () => {
+  closeDeleteConfirm();
+};
+
+// 关闭弹框方法
 const closeCreateModal = () => {
   isCreateModalOpen.value = false;
 };
 
-// 打开创建弹窗
-const openCreateModal = () => {
-  newKey.value = {
-    keyAlias: "",
-    algorithm: "",
-    keyType: "对称密钥",
-    tags: "",
-    notes: "",
-    status: "active",
-    version: "",    
-  };
-  isCreateModalOpen.value = true;
+const closeAssociateModal = () => {
+  isAssociateModalOpen.value = false;
+  currentItem.value = null;
 };
 
-// 创建新密钥
-const createKey = () => {
-  const newId = `INV${invoices.value.length + 101}`;
-  const newInvoice = {
-    invoice: newId,
-    ...newKey.value,
-    createDate: new Date().toISOString().split("T")[0],
-    // version: "v1.0",
-  };
-  console.log("newInvoice", newInvoice);
-  invoices.value.unshift(newInvoice);
-  closeCreateModal();
-  toast({
-    description: "创建成功！",
-  });
+const closeDeleteConfirm = () => {
+  isDeleteConfirmOpen.value = false;
+  deletingItem.value = null;
 };
 </script>
