@@ -27,7 +27,7 @@ export const navMenu: NavMenu[] = [
       {
         title: '主密钥管理',
         icon: 'i-lucide-file-lock',
-        link: '/password/masterKeyManage',
+        link: '/masterKeys',
       },
       {
         title: '数据密钥管理',

@@ -147,9 +147,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useToast } from "@/components/ui/toast/use-toast";
-
-const { toast } = useToast();
+import { toast } from "@/components/ui/toast";
 
 // 模拟数据（增加更多条目用于分页测试）
 const invoices = ref([

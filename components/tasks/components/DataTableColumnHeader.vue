@@ -34,16 +34,16 @@ export default {
       <DropdownMenuContent align="start">
         <DropdownMenuItem @click="column.toggleSorting(false)">
           <Icon name="i-radix-icons-arrow-up" class="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-          Asc
+          升序
         </DropdownMenuItem>
         <DropdownMenuItem @click="column.toggleSorting(true)">
           <Icon name="i-radix-icons-arrow-down" class="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-          Desc
+          降序
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem @click="column.toggleVisibility(false)">
           <Icon name="i-radix-icons-eye-none" class="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-          Hide
+          隐藏
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

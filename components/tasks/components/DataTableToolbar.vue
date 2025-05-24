@@ -1,3 +1,4 @@
+<!-- DataTableToolbar.vue -->
 <script setup lang="ts">
 import type { Table } from '@tanstack/vue-table'
 import { computed } from 'vue'

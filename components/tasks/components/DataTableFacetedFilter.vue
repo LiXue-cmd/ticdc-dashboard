@@ -1,3 +1,4 @@
+<!-- DataTableFacetedFilter.vue -->
 <script setup lang="ts">
 import type { Column } from '@tanstack/vue-table'
 import type { Component } from 'vue'

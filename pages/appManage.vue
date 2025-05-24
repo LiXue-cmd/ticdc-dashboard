@@ -103,10 +103,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useToast } from "@/components/ui/toast/use-toast";
-// import { Switch } from "@shadcn/vue"; // 确保引入Switch组件
-
-const { toast } = useToast();
+import { toast } from "@/components/ui/toast";
 
 // 模拟数据
 const apps = ref([
