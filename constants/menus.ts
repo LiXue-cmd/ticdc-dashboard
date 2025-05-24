@@ -136,7 +136,7 @@ export const navMenu: NavMenu[] = [
       {
         title: '标签管理',
         icon: 'i-lucide-tag',
-        link: '/labelManage',
+        link: '/tags',
       }]
   },
   {
@@ -158,12 +158,12 @@ export const navMenu: NavMenu[] = [
           {
             title: '操作日志',
             icon: 'i-lucide-handshake',
-            link: '/logs/operationLog',
+            link: '/operationLog',
           },
           {
             title: '接口日志',
             icon: 'i-lucide-cable',
-            link: '/logs/interfaceLog',
+            link: '/interfaceLog',
           }
         ]
       }]
@@ -178,7 +178,7 @@ export const navMenu: NavMenu[] = [
           {
             title: '用户管理',
             icon: 'i-lucide-circle',
-            link: '/systemConfig/userManage',
+            link: '/userManage',
           },
           {
             title: '数据备份',
