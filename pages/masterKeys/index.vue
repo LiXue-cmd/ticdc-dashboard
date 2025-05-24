@@ -91,15 +91,6 @@ const masterKeys = ref<any[]>([
     status: "active",
   },
 ]);
-const newKey = ref({
-  keyAlias: "",
-  algorithm: "",
-  keyType: "对称密钥",
-  tags: "",
-  notes: "",
-  version: "",
-  status: "active", // 默认启用
-});
 
 const columns: ColumnDef<any>[] = [
   {
@@ -216,25 +207,6 @@ async function loadMasterKeys() {
 onMounted(async () => {
   await loadMasterKeys();
 });
-
-const createKey = async () => {
-  const { error } = await useFetch("/api/cdc/newMasterKey", {
-    method: "POST",
-    body: newKey.value,
-  });
-  if (error?.value) {
-    console.log(JSON.stringify(error.value));
-    toast({
-      title: "主密钥创建失败",
-      description: `错误信息: ${error.value?.statusMessage}`,
-      variant: "destructive",
-    });
-  } else {
-    await loadMasterKeys();
-    closeCreateModal();
-    toast({ description: "主密钥创建成功！" });
-  }
-};
 
 const openDetailModal = (invoice: any) => {
   // 这里可以添加打开详情弹窗的逻辑

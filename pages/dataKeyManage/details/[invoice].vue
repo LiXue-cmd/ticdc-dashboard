@@ -2,12 +2,9 @@
   <div class="w-full max-w-2xl mx-auto p-6">
     <div class="flex flex-wrap items-center justify-between mb-6">
       <div>
-        <h2 class="text-2xl font-bold">主密钥详情</h2>
+        <h2 class="text-2xl font-bold">数据密钥详情</h2>
         <p class="text-muted-foreground">密钥ID：{{ activeKey.invoice }}</p>
       </div>
-      <NuxtLink to="/password/masterKeys" class="btn btn-outline">
-        返回列表
-      </NuxtLink>
     </div>
 
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -33,7 +30,7 @@
               :variant="activeKey.status === 'active' ? 'success' : 'error'"
               class="mt-0.5"
             >
-              {{ activeKey.status === 'active' ? '启用' : '禁用' }}
+              {{ activeKey.status === "active" ? "启用" : "禁用" }}
             </Badge>
           </div>
         </div>
@@ -45,7 +42,9 @@
         <div class="space-y-4">
           <div class="flex items-start space-x-4">
             <span class="font-medium">标签：</span>
-            <span v-if="activeKey.tags">{{ activeKey.tags.split(',').join(', ') }}</span>
+            <span v-if="activeKey.tags">{{
+              activeKey.tags.split(",").join(", ")
+            }}</span>
             <span v-else>-</span>
           </div>
           <div class="flex items-start space-x-4">
@@ -58,10 +57,17 @@
           </div>
           <div class="flex items-start space-y-2">
             <span class="font-medium">备注说明：</span>
-            <p class="text-muted-foreground">{{ activeKey.notes || "无备注" }}</p>
+            <p class="text-muted-foreground">
+              {{ activeKey.notes || "无备注" }}
+            </p>
           </div>
         </div>
       </div>
+    </div>
+    <div class="flex justify-end mt-6">
+      <NuxtLink to="/dataKeyManage">
+        <Button type="button">返回列表</Button>
+      </NuxtLink>
     </div>
   </div>
 </template>
@@ -82,24 +88,28 @@ const activeKey = ref<any>({});
 // 映射密钥类型（与创建页保持一致）
 const mapKeyType = (keyType: string) => {
   switch (keyType) {
-    case "symmetric": return "对称密钥";
-    case "asymmetric": return "非对称密钥";
-    case "hmac": return "HMAC";
-    default: return "-";
+    case "symmetric":
+      return "对称密钥";
+    case "asymmetric":
+      return "非对称密钥";
+    case "hmac":
+      return "HMAC";
+    default:
+      return "-";
   }
 };
 
 onMounted(async () => {
   if (!invoice) return;
-  
+
   // 模拟接口请求（实际需替换为真实API）
-  const { data, error } = await useFetch(`/api/cdc/masterKeys/${invoice}`);
-  
+  const { data, error } = await useFetch(`/api/cdc/dataKeyManage/${invoice}`);
+
   if (error.value) {
     console.error("获取密钥详情失败:", error.value);
     return;
   }
-  
+
   activeKey.value = data.value || {};
 });
 </script>

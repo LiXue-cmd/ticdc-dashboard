@@ -1,7 +1,7 @@
-<!-- /password/masterKeys/create.vue -->
+<!-- /dataKeyManage/create.vue -->
 <template>
   <div class="w-full max-w-2xl mx-auto p-6">
-    <h2 class="text-2xl font-bold mb-4">新增主密钥</h2>
+    <h2 class="text-2xl font-bold mb-4">新增数据密钥</h2>
 
     <form class="mt-6 px-6 space-y-4">
       <div>
@@ -103,7 +103,7 @@ const newKey = ref({
 });
 
 const goBack = async () => {
-  router.push("/password/masterKeys");
+  router.push("/dataKeyManage");
 };
 // 提交表单
 const handleSubmit = async () => {
@@ -135,17 +135,17 @@ const handleSubmit = async () => {
     if (data.value) {
       toast({
         title: "成功",
-        description: "主密钥创建成功",
+        description: "数据密钥创建成功",
         variant: "default",
       });
-      router.push("/password/masterKeys"); // 创建成功后返回列表页
+      router.push("/dataKeyManage"); // 创建成功后返回列表页
       // 重置表单
       resetForm();
     }
   } catch (err) {
     toast({
       title: "错误",
-      description: err.message || "主密钥创建失败",
+      description: err.message || "数据密钥创建失败",
       variant: "destructive",
     });
   }
@@ -180,7 +180,7 @@ const mapKeyType = (keyType: string) => {
 watch(
   () => router.currentRoute.value.path,
   (newPath) => {
-    if (newPath === "/password/masterKeys/create") {
+    if (newPath === "/dataKeyManage/create") {
       resetForm();
     }
   },

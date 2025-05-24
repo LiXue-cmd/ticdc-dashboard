@@ -32,12 +32,12 @@ export const navMenu: NavMenu[] = [
       {
         title: '数据密钥管理',
         icon: 'i-lucide-key',
-        link: '/password/dataKeyManage'
+        link: '/dataKeyManage'
       },
       {
         title: '密钥别名管理',
         icon: 'i-lucide-rectangle-ellipsis',
-        link: '/password/keyAliasManage'
+        link: '/keyAliasManage'
       },
       // {
       //   title: '身份验证',

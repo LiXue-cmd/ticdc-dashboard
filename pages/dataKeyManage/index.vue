@@ -1,18 +1,23 @@
-<!-- /password/masterKeys/index.vue -->
+<!-- /dataKeyManage/index.vue -->
 <template>
   <div class="w-full flex flex-col items-stretch gap-4">
     <div class="flex flex-wrap items-end justify-between gap-2">
       <div>
-        <h2 class="text-2xl font-bold tracking-tight">主密钥管理</h2>
-        <p class="text-muted-foreground">Here's a list of your master keys!</p>
+        <h2 class="text-2xl font-bold tracking-tight">数据密钥管理</h2>
+        <p class="text-muted-foreground">这里是数据密钥管理的描述</p>
       </div>
     </div>
     <DataTable
       :columns="columns"
-      :data="masterKeys"
+      :data="dataKeyManage"
       :filterColumns="filterColumns"
-      addTaskRoute="/password/masterKeys/create"
-      addTaskText="新增主密钥"
+      addTaskRoute="/dataKeyManage/create"
+      addTaskText="新增数据密钥"
+      :statusFilterField="'status'"
+      :statusOptions="[
+        { label: '启用', value: 'active' },
+        { label: '禁用', value: 'inactive' },
+      ]"
     />
   </div>
 </template>
@@ -34,7 +39,7 @@ const filterColumns = ref([
   { accessorKey: "keyAlias", header: "密钥别名" },
   { accessorKey: "algorithm", header: "算法" },
 ]);
-const masterKeys = ref<any[]>([
+const dataKeyManage = ref<any[]>([
   {
     invoice: "MK-2023001",
     keyAlias: "系统默认密钥",
@@ -86,15 +91,6 @@ const masterKeys = ref<any[]>([
     status: "active",
   },
 ]);
-const newKey = ref({
-  keyAlias: "",
-  algorithm: "",
-  keyType: "对称密钥",
-  tags: "",
-  notes: "",
-  version: "",
-  status: "active", // 默认启用
-});
 
 const columns: ColumnDef<any>[] = [
   {
@@ -201,44 +197,25 @@ const columns: ColumnDef<any>[] = [
 ];
 
 async function loadMasterKeys() {
-  const { data: feeds } = await useFetch("/api/cdc/masterKeys");
+  const { data: feeds } = await useFetch("/api/cdc/dataKeyManage");
   if (feeds.value) {
-    masterKeys.value = feeds.value;
+    dataKeyManage.value = feeds.value;
   }
-  console.debug("masterKeys", masterKeys.value);
+  console.debug("dataKeyManage", dataKeyManage.value);
 }
 
 onMounted(async () => {
   await loadMasterKeys();
 });
 
-const createKey = async () => {
-  const { error } = await useFetch("/api/cdc/newMasterKey", {
-    method: "POST",
-    body: newKey.value,
-  });
-  if (error?.value) {
-    console.log(JSON.stringify(error.value));
-    toast({
-      title: "主密钥创建失败",
-      description: `错误信息: ${error.value?.statusMessage}`,
-      variant: "destructive",
-    });
-  } else {
-    await loadMasterKeys();
-    closeCreateModal();
-    toast({ description: "主密钥创建成功！" });
-  }
-};
-
 const openDetailModal = (invoice: any) => {
   // 这里可以添加打开详情弹窗的逻辑
   console.log("Open detail modal for", invoice);
-  router.push(`/password/masterKeys/details/${invoice}`);
+  router.push(`/dataKeyManage/details/${invoice}`);
 };
 
 const updateStatus = (task: any, targetStatus: string) => {
-  const index = masterKeys.value.findIndex(
+  const index = dataKeyManage.value.findIndex(
     (item) => item.invoice === task.invoice
   );
   if (index === -1) {
@@ -252,11 +229,11 @@ const updateStatus = (task: any, targetStatus: string) => {
     status: targetStatus,
   };
 
-  // 更新 masterKeys 数组，触发响应式更新
-  masterKeys.value = [
-    ...masterKeys.value.slice(0, index),
+  // 更新 dataKeyManage 数组，触发响应式更新
+  dataKeyManage.value = [
+    ...dataKeyManage.value.slice(0, index),
     newTask,
-    ...masterKeys.value.slice(index + 1),
+    ...dataKeyManage.value.slice(index + 1),
   ];
 };
 </script>
