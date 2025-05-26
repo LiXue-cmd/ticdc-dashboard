@@ -1,11 +1,11 @@
 <template>
   <div class="w-full max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-sm">
-    <h2 class="text-xl font-bold mb-4">编辑应用 - {{ form.name }}</h2>
+    <h2 class="text-xl font-bold mb-4">编辑用户 - {{ form.name }}</h2>
     
     <form class="space-y-4" @submit.prevent="handleSubmit">
       <div>
         <label class="block text-sm font-medium text-gray-700">
-          应用名称
+          用户名称
           <span class="text-red-500">*</span>
         </label>
         <Input
@@ -13,7 +13,7 @@
           v-model.trim="form.name"
           :class="{ 'border-red-500': errors.name }"
           required
-          placeholder="请输入应用名称（1-30字）"
+          placeholder="请输入用户名称（1-30字）"
           aria-invalid="errors.name"
         />
         <p v-if="errors.name" class="text-sm text-red-500 mt-1">
@@ -29,7 +29,7 @@
           v-model.trim="form.description"
           rows="3"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          placeholder="可选：应用用途说明（最多100字）"
+          placeholder="可选：用户用途说明（最多100字）"
         />
       </div>
 
@@ -72,7 +72,7 @@ const errors = ref<{
   name?: string;
 }>({});
 
-// 生命周期：加载应用详情
+// 生命周期：加载用户详情
 onMounted(async () => {
   const tagId = route.params.id as string;
   if (!tagId) return router.push("/userManage"); // 无ID时返回列表页
@@ -92,10 +92,10 @@ onMounted(async () => {
 
     form.value = data.value || { id: 0, name: "", description: "" };
   } catch (err) {
-    console.error("加载应用失败:", err);
+    console.error("加载用户失败:", err);
     toast({
       title: "系统错误",
-      description: "获取应用详情时出错",
+      description: "获取用户详情时出错",
       variant: "destructive",
     });
     router.push("/userManage");
@@ -106,12 +106,12 @@ onMounted(async () => {
 
 // 表单验证规则
 const validateName = (value: string) => {
-  if (!value) return "应用名称不能为空";
+  if (!value) return "用户名称不能为空";
   if (value.length < 1 || value.length > 30) {
-    return "应用名称需1-30字";
+    return "用户名称需1-30字";
   }
   if (!/^[a-zA-Z0-9\u4e00-\u9fa5_-]+$/.test(value)) {
-    return "应用名称仅支持中英文、数字、下划线和短横线";
+    return "用户名称仅支持中英文、数字、下划线和短横线";
   }
   return "";
 };
@@ -136,7 +136,7 @@ const handleSubmit = async () => {
   }
 
   const tagId = form.value.id;
-  if (!tagId) return toast({ title: "错误", description: "应用ID缺失" });
+  if (!tagId) return toast({ title: "错误", description: "用户ID缺失" });
 
   isLoading.value = true;
 
@@ -155,7 +155,7 @@ const handleSubmit = async () => {
 
     if (data.value) {
       toast({
-        description: "应用更新成功！",
+        description: "用户更新成功！",
         variant: "default",
       });
       router.push("/userManage"); // 保存后返回列表页

@@ -9,7 +9,7 @@
     </div>
 
     <!-- 搜索和筛选区域 -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <!-- <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="relative">
         <Input
           v-model="searchQuery"
@@ -48,13 +48,14 @@
           重置
         </Button>
       </div>
-    </div>
+    </div> -->
 
     <!-- 接口日志列表 -->
     <DataTable
       :columns="columns"
       :data="filteredLogs"
       :is-loading="isLoading"
+      :filterColumns="filterColumns"
       no-data-text="暂无接口调用日志"
       class="mt-4"
     />
@@ -66,7 +67,7 @@ import { ref, computed, onMounted } from "vue";
 import { useToast } from "@/components/ui/toast/use-toast";
 import DataTable from "@/components/tasks/components/DataTable.vue";
 import type { ColumnDef } from "@tanstack/vue-table";
-import { SearchIcon } from "@heroicons/vue/24/solid";
+// import { SearchIcon } from "@heroicons/vue/24/solid";
 import { h } from "vue";
 import { useFetch } from "#app";
 
@@ -149,6 +150,12 @@ const logs = ref<any[]>([
   },
 ]);
 
+// 过滤配置
+const filterColumns = ref([
+  { accessorKey: "path", header: "请求路径" },
+  { accessorKey: "user", header: "用户" },
+  { accessorKey: "status", header: "状态" },
+]);
 // 过滤配置
 const filteredLogs = computed(() => {
   let result = logs.value;

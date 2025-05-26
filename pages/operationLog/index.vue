@@ -8,18 +8,6 @@
       </div>
     </div>
 
-    <!-- 搜索过滤 -->
-    <div class="w-full max-w-2xl">
-      <Input
-        v-model="searchQuery"
-        placeholder="搜索操作类型、用户或资源..."
-        class="pl-9 w-full"
-        :disabled="isLoading"
-      >
-        <SearchIcon class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-      </Input>
-    </div>
-
     <!-- 日志列表 -->
     <DataTable
       :columns="columns"
@@ -37,7 +25,7 @@ import { ref, computed, onMounted } from "vue";
 import { useToast } from "@/components/ui/toast/use-toast";
 import DataTable from "@/components/tasks/components/DataTable.vue";
 import type { ColumnDef } from "@tanstack/vue-table";
-import { SearchIcon } from "@heroicons/vue/24/solid";
+// import { SearchIcon } from "@heroicons/vue/24/solid";
 import { h } from "vue";
 import { useFetch } from "#app";
 

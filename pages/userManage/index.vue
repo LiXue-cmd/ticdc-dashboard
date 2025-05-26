@@ -3,22 +3,22 @@
     <!-- 页面标题栏 -->
     <div class="flex flex-wrap items-center justify-between gap-4">
       <div>
-        <h2 class="text-2xl font-bold tracking-tight">应用管理</h2>
+        <h2 class="text-2xl font-bold tracking-tight">用户管理</h2>
         <p class="text-muted-foreground">
-          管理系统中所有应用，支持过滤、编辑和删除操作
+          管理系统中所有用户，支持过滤、编辑和删除操作
         </p>
       </div>
     </div>
 
-    <!-- 应用列表 -->
+    <!-- 用户列表 -->
     <DataTable
       :columns="columns"
-      :data="filteredTags"
+      :data="filteredUsers"
       :filterColumns="filterColumns"
       :is-loading="isLoading"
-      no-data-text="暂无应用数据"
+      no-data-text="暂无用户数据"
       addTaskRoute="/userManage/create"
-      addTaskText="新增应用"
+      addTaskText="新增用户"
     />
 
     <!-- 删除确认对话框 -->
@@ -27,33 +27,55 @@
         <DialogTitle class="text-lg font-medium">确认删除</DialogTitle>
         <DialogDescription class="mt-2 text-muted-foreground">
           确定要删除
-          <strong class="text-gray-900">{{ deletingTag.name }}</strong>
+          <strong class="text-gray-900">{{ deletingUser.name }}</strong>
           吗？<br />
           此操作不可撤销，且会影响关联的所有资源。
         </DialogDescription>
 
         <div class="mt-4 flex justify-end gap-2">
           <Button variant="outline" @click="closeDeleteModal"> 取消 </Button>
-          <Button variant="destructive" @click="handleDeleteTag"> 删除 </Button>
+          <Button variant="destructive" @click="handleDeleteUser"> 删除 </Button>
         </div>
       </DialogContent>
     </Dialog>
 
-    <!-- 重置AppSecret确认对话框 -->
-    <Dialog :open="isResetModalOpen" on-close="closeResetModal">
+    <!-- 修改密码对话框 -->
+    <Dialog :open="isChangePasswordModalOpen" on-close="closeChangePasswordModal">
       <DialogContent class="w-80">
-        <DialogTitle class="text-lg font-medium">确认重置</DialogTitle>
+        <DialogTitle class="text-lg font-medium">修改密码</DialogTitle>
         <DialogDescription class="mt-2 text-muted-foreground">
-          确定要重置
-          <strong class="text-gray-900">{{ resettingApp.name }}</strong>
-          的AppSecret吗？<br />
-          此操作将生成新的密钥，原密钥立即失效。
+          为用户 <strong class="text-gray-900">{{ changingPasswordUser.name }}</strong> 修改登录密码
         </DialogDescription>
 
-        <div class="mt-4 flex justify-end gap-2">
-          <Button variant="outline" @click="closeResetModal"> 取消 </Button>
-          <Button @click="handleResetAppSecret"> 确认重置 </Button>
-        </div>
+        <form @submit.prevent>
+          <div class="mt-4 space-y-4">
+            <div>
+              <label for="newPassword" class="block text-sm font-medium text-gray-700">新密码</label>
+              <Input
+                type="password"
+                id="newPassword"
+                v-model="newPassword"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                placeholder="输入6-16位新密码"
+              />
+            </div>
+            <div>
+              <label for="confirmPassword" class="block text-sm font-medium text-gray-700">确认密码</label>
+              <Input
+                type="password"
+                id="confirmPassword"
+                v-model="confirmPassword"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                placeholder="再次输入新密码"
+              />
+            </div>
+          </div>
+
+          <div class="mt-4 flex justify-end gap-2">
+            <Button variant="outline" @click="closeChangePasswordModal"> 取消 </Button>
+            <Button type="submit" @click="handleChangePassword"> 确认修改 </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   </div>
@@ -70,52 +92,88 @@ import { h } from "vue";
 import { useFetch } from "#app";
 import { useRouter } from "vue-router";
 
-// 状态管理
-const router = useRouter();
-const { toast } = useToast();
-const isLoading = ref(false);
-const searchQuery = ref("");
-const userManage = ref<any[]>([
+// 模拟用户数据
+const mockUsers = [
   {
     id: 1,
-    name: "系统应用",
-    description: "默认系统应用",
+    name: "系统管理员",
+    description: "系统超级管理员，拥有所有权限",
+    leader: "张三",
+    phone: "13800138000",
     createDate: "2023-01-01",
     updateDate: "2023-01-05",
     status: "active",
   },
   {
     id: 2,
-    name: "用户应用",
-    description: "用于用户分类",
+    name: "财务主管",
+    description: "负责财务报表和预算管理",
+    leader: "李四",
+    phone: "13900139000",
     createDate: "2023-02-15",
     updateDate: "2023-02-20",
     status: "active",
   },
   {
     id: 3,
-    name: "权限应用",
-    description: "控制权限范围",
+    name: "人力资源",
+    description: "负责员工招聘和培训",
+    leader: "王五",
+    phone: "13700137000",
     createDate: "2023-03-10",
     updateDate: "2023-03-12",
+    status: "inactive",
+  },
+  {
+    id: 4,
+    name: "开发工程师",
+    description: "负责系统开发和维护",
+    leader: "赵六",
+    phone: "13600136000",
+    createDate: "2023-04-20",
+    updateDate: "2023-04-25",
     status: "active",
   },
-]);
+  {
+    id: 5,
+    name: "测试工程师",
+    description: "负责系统测试和质量保障",
+    leader: "钱七",
+    phone: "13500135000",
+    createDate: "2023-05-05",
+    updateDate: "2023-05-10",
+    status: "active",
+  },
+];
+
+// 状态管理
+const router = useRouter();
+const { toast } = useToast();
+const isLoading = ref(false);
+const searchQuery = ref("");
+const users = ref<any[]>([]);
 
 // 删除相关状态
 const isDeleteModalOpen = ref(false);
-const deletingTag = ref<any>({});
+const deletingUser = ref<any>({});
 
-// 重置AppSecret相关状态
-const isResetModalOpen = ref(false);
-const resettingApp = ref<any>({});
+// 修改密码相关状态
+const isChangePasswordModalOpen = ref(false);
+const changingPasswordUser = ref<any>({});
+const newPassword = ref("");
+const confirmPassword = ref("");
 
-const filterColumns = ref([{ accessorKey: "name", header: "应用名称" }]);
+const filterColumns = ref([{ accessorKey: "name", header: "用户名称" }]);
 
 // 计算属性：过滤后的数据
-const filteredTags = computed(() => {
-  return userManage.value.filter((tag) =>
-    tag.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+const filteredUsers = computed(() => {
+  if (!Array.isArray(users.value)) {
+    console.error('users.value 不是数组:', users.value);
+    return [];
+  }
+  
+  return users.value.filter((user) =>
+    user.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
 });
 
@@ -123,55 +181,58 @@ const filteredTags = computed(() => {
 const columns: ColumnDef<any>[] = [
   {
     accessorKey: "id",
-    header: "APPID",
+    header: "ID",
     cell: ({ row }) => row.getValue("id") || "-",
     canSort: true,
     canHide: true,
   },
   {
     accessorKey: "name",
-    header: "应用名称",
+    header: "名称",
     cell: ({ row }) => row.getValue("name") || "-",
     canSort: true,
   },
   {
     accessorKey: "description",
-    header: "描述",
+    header: "简介",
     cell: ({ row }) => row.getValue("description") || "-",
+    cellProps: { class: "max-w-[200px] overflow-ellipsis" },
+  },
+  {
+    accessorKey: "leader",
+    header: "负责人",
+    cell: ({ row }) => row.getValue("leader") || "-",
     canSort: true,
-    cellProps: { class: "max-w-[200px] overflow-ellipsis" }, // 限制描述宽度
+  },
+  {
+    accessorKey: "phone",
+    header: "电话",
+    cell: ({ row }) => row.getValue("phone") || "-",
+    canSort: true,
   },
   {
     accessorKey: "createDate",
     header: "创建日期",
     cell: ({ row }) => row.getValue("createDate") || "-",
-    canSort: true,
     cellProps: { class: "w-28" },
   },
   {
     accessorKey: "updateDate",
     header: "更新日期",
     cell: ({ row }) => row.getValue("updateDate") || "-",
-    canSort: true,
     cellProps: { class: "w-28" },
   },
-
   {
     accessorKey: "status",
     header: "状态",
     cell: ({ row }) => {
       const status = row.getValue("status");
-      return h(
-        Badge,
-        {
-          variant: "outline",
-          // class: status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800',
-        },
-        () => (status === "active" ? "启用" : "禁用")
-      );
+      return h(Badge, {
+        variant: "outline",
+        // class: status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800",
+      }, () => status === "active" ? "启用" : "禁用");
     },
-    canSort: true, // 支持按状态排序
-    canHide: true,
+    canSort: true,
   },
   {
     id: "actions",
@@ -182,7 +243,7 @@ const columns: ColumnDef<any>[] = [
           type: "action",
           label: "编辑",
           icon: "i-radix-icons-edit",
-          onClick: (tag) => editTag(tag.id),
+          onClick: (user) => editUser(user.id),
           variant: "outline",
         },
         {
@@ -190,161 +251,164 @@ const columns: ColumnDef<any>[] = [
           label: "状态",
           subType: "status",
           statuses: ["active", "inactive"],
-          onStatusChange: (task, status) => updateStatus(task, status),
+          onStatusChange: (user, status) => updateStatus(user, status),
         },
         {
           type: "action",
-          label: "重置AppSecret",
+          label: "修改密码",
           icon: "i-radix-icons-key",
-          onClick: (tag) => showResetConfirm(tag), // 新增重置点击事件
+          onClick: (user) => showChangePassword(user),
           variant: "outline",
         },
-        // {
-        //   type: "action",
-        //   label: "删除",
-        //   icon: "i-radix-icons-trash",
-        //   onClick: (tag) => showDeleteConfirm(tag),
-        //   variant: "destructive",
-        // },
+        {
+          type: "action",
+          label: "删除",
+          icon: "i-radix-icons-trash",
+          onClick: (user) => showDeleteConfirm(user),
+          variant: "destructive",
+        },
       ];
-
-      return h(DataTableRowActions, {
-        row,
-        actions,
-        iconName: "i-radix-icons-dots-horizontal",
-      });
+      return h(DataTableRowActions, { row, actions, iconName: "i-radix-icons-dots-horizontal" });
     },
     canHide: true,
   },
 ];
 
 // 生命周期钩子
-onMounted(() => {
-  loadTags();
-});
+onMounted(() => loadUsers());
 
-// 数据加载
-async function loadTags() {
+// 数据加载 - 使用模拟数据
+const loadUsers = async () => {
   isLoading.value = true;
+  
   try {
-    const { data } = await useFetch("/api/userManage");
-    if (data.value) {
-      userManage.value = data.value;
-    }
+    // 模拟API请求延迟
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // 使用模拟数据
+    users.value = mockUsers;
+    
+    toast({
+      title: "数据加载成功",
+      description: "已使用模拟数据",
+      variant: "default",
+    });
   } catch (error) {
+    console.error('获取用户列表失败:', error);
+    // 出错时仍使用模拟数据
+    users.value = mockUsers;
     toast({
       title: "加载失败",
-      description: "获取应用列表时出错",
-      variant: "destructive",
+      description: "使用模拟数据替代",
+      variant: "warning",
     });
   } finally {
     isLoading.value = false;
   }
-}
+};
 
-// 新增/编辑页面跳转
-const editTag = (id: number) => {
+// 编辑用户
+const editUser = (id: number) => {
   router.push(`/userManage/edit/${id}`);
 };
 
 // 删除流程
-const showDeleteConfirm = (tag: any) => {
-  deletingTag.value = tag;
+const showDeleteConfirm = (user: any) => {
+  deletingUser.value = user;
   isDeleteModalOpen.value = true;
 };
 
 const closeDeleteModal = () => {
   isDeleteModalOpen.value = false;
-  deletingTag.value = {};
+  deletingUser.value = {};
 };
 
-const handleDeleteTag = async () => {
-  const { id } = deletingTag.value;
+const handleDeleteUser = async () => {
+  const { id } = deletingUser.value;
+  if (!id) return;
+  
+  try {
+    // 模拟API请求延迟
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // 从本地数据中删除
+    if (Array.isArray(users.value)) {
+      users.value = users.value.filter(user => user.id !== id);
+      toast({ description: "用户删除成功", variant: "default" });
+    } else {
+      console.error('删除用户时 users.value 不是数组');
+      toast({ title: "操作失败", description: "用户数据格式错误", variant: "destructive" });
+    }
+    
+    closeDeleteModal();
+  } catch (error) {
+    console.error("删除失败:", error);
+    toast({ title: "系统错误", description: "处理删除请求时出错", variant: "destructive" });
+  }
+};
+
+// 修改密码流程
+const showChangePassword = (user: any) => {
+  changingPasswordUser.value = user;
+  newPassword.value = "";
+  confirmPassword.value = "";
+  isChangePasswordModalOpen.value = true;
+};
+
+const closeChangePasswordModal = () => {
+  isChangePasswordModalOpen.value = false;
+  changingPasswordUser.value = {};
+};
+
+const handleChangePassword = async () => {
+  // 密码验证
+  if (newPassword.value.length < 6 || newPassword.value.length > 16) {
+    return toast({ title: "格式错误", description: "密码需6-16位", variant: "destructive" });
+  }
+  if (newPassword.value !== confirmPassword.value) {
+    return toast({ title: "验证失败", description: "两次密码不一致", variant: "destructive" });
+  }
+
+  const { id } = changingPasswordUser.value;
   if (!id) return;
 
   try {
-    const { error } = await useFetch(`/api/userManage/${id}`, {
-      method: "DELETE",
-    });
-
-    if (error?.value) {
-      toast({
-        title: "删除失败",
-        description: error.value.statusMessage,
-        variant: "destructive",
-      });
-    } else {
-      userManage.value = userManage.value.filter((tag) => tag.id !== id);
-      toast({
-        description: "应用已成功删除！",
-        variant: "default",
-      });
-      closeDeleteModal();
-    }
+    // 模拟API请求
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    toast({ title: "修改成功", description: "请使用新密码登录", variant: "default" });
+    closeChangePasswordModal();
   } catch (error) {
-    console.error("删除失败:", error);
-    toast({
-      title: "系统错误",
-      description: "处理删除请求时发生未知错误",
-      variant: "destructive",
-    });
+    console.error("修改密码失败:", error);
+    toast({ title: "系统错误", description: "处理密码修改请求时出错", variant: "destructive" });
   }
 };
 
-// 重置AppSecret流程
-const showResetConfirm = (app: any) => {
-  resettingApp.value = app;
-  isResetModalOpen.value = true;
-};
-
-const closeResetModal = () => {
-  isResetModalOpen.value = false;
-  resettingApp.value = {};
-};
-
-const handleResetAppSecret = () => {
-  const { id } = resettingApp.value;
-  if (!id) return;
-
-  // 模拟重置逻辑（实际需调用API）
-  userManage.value = userManage.value.map((app) =>
-    app.id === id ? { ...app, appSecret: generateNewSecret() } : app
-  );
-
-  toast({
-    title: "重置成功",
-    description: "AppSecret已更新，请立即保存新密钥！",
-    variant: "default",
-  });
-  closeResetModal();
-};
-
-// 模拟生成新密钥（实际需替换为安全的密钥生成逻辑）
-const generateNewSecret = () => {
-  return `APPSECRET-${Math.random().toString(36).substr(2, 16)}`;
-};
-
-const updateStatus = (task: any, targetStatus: string) => {
-  const index = userManage.value.findIndex(
-    (item) => item.invoice === task.invoice
-  );
-  if (index === -1) {
-    console.error("未找到对应的密钥记录");
+// 更新用户状态
+const updateStatus = (user: any, status: string) => {
+  if (!Array.isArray(users.value)) {
+    console.error('更新用户状态时 users.value 不是数组');
     return;
   }
-
-  // 创建新对象并更新状态
-  const newTask = {
-    ...task,
-    status: targetStatus,
-  };
-
-  // 更新 userManage 数组，触发响应式更新
-  userManage.value = [
-    ...userManage.value.slice(0, index),
-    newTask,
-    ...userManage.value.slice(index + 1),
+  
+  const index = users.value.findIndex(u => u.id === user.id);
+  if (index === -1) return;
+  
+  // 创建新对象更新状态
+  const updatedUser = { ...users.value[index], status };
+  
+  // 使用展开语法保持响应式更新
+  users.value = [
+    ...users.value.slice(0, index),
+    updatedUser,
+    ...users.value.slice(index + 1)
   ];
+  
+  toast({
+    title: "状态更新成功",
+    description: `${user.name} 已${status === 'active' ? '启用' : '禁用'}`,
+    variant: "default",
+  });
 };
 </script>
 

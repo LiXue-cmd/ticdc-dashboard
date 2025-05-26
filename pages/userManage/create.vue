@@ -1,11 +1,11 @@
 <template>
   <div class="w-full max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-sm">
-    <h2 class="text-xl font-bold mb-4">新增应用</h2>
+    <h2 class="text-xl font-bold mb-4">新增用户</h2>
     
     <form class="space-y-4" @submit.prevent="handleSubmit">
       <div>
         <label class="block text-sm font-medium text-gray-700">
-          应用名称
+          用户名称
           <span class="text-red-500">*</span>
         </label>
         <Input
@@ -16,7 +16,7 @@
             'shadow-sm': !errors.name,
           }"
           required
-          placeholder="请输入应用名称（1-30字）"
+          placeholder="请输入用户名称（1-30字）"
           aria-invalid="errors.name"
         />
         <p v-if="errors.name" class="text-sm text-red-500 mt-1">
@@ -32,7 +32,7 @@
           v-model.trim="form.description"
           rows="3"
           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          placeholder="可选：应用用途说明（最多100字）"
+          placeholder="可选：用户用途说明（最多100字）"
         />
       </div>
 
@@ -75,12 +75,12 @@ const errors = ref<{
 
 // 表单验证规则
 const validateName = (value: string) => {
-  if (!value) return "应用名称不能为空";
+  if (!value) return "用户名称不能为空";
   if (value.length < 1 || value.length > 30) {
-    return "应用名称需1-30字";
+    return "用户名称需1-30字";
   }
   if (!/^[a-zA-Z0-9\u4e00-\u9fa5_-]+$/.test(value)) {
-    return "应用名称仅支持中英文、数字、下划线和短横线";
+    return "用户名称仅支持中英文、数字、下划线和短横线";
   }
   return "";
 };
@@ -118,7 +118,7 @@ const handleSubmit = async () => {
 
     if (data.value) {
       toast({
-        description: "应用新增成功！",
+        description: "用户新增成功！",
         variant: "default",
       });
       router.push("/userManage"); // 保存后返回列表页

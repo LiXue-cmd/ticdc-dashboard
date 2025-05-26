@@ -68,7 +68,7 @@
       </div>
       <!-- 新增任务按钮和切换列显示菜单 -->
       <div class="flex items-center space-x-2">
-        <NuxtLink :to="addTaskRoute" class="h-8 px-2">
+        <NuxtLink :to="addTaskRoute" class="h-8 px-2" v-if="addTaskRoute">
           <Button variant="outline" size="sm">
             {{ addTaskText }}
           </Button>
@@ -286,8 +286,8 @@ const getStatusLabel = (value: string | undefined) => {
 
 const filterColumns = computed(() => props.filterColumns || props.columns);
 const isFiltered = computed(() => table.getState().columnFilters.length > 0);
-const addTaskRoute = computed(() => props.addTaskRoute || "/tasks/create");
-const addTaskText = computed(() => props.addTaskText || "新建任务");
+const addTaskRoute = computed(() => props.addTaskRoute || "");
+const addTaskText = computed(() => props.addTaskText || "");
 
 // 计算可切换的列
 const toggleColumns = computed(() =>
