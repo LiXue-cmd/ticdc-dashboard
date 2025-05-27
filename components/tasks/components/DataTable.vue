@@ -5,23 +5,16 @@
     <div class="flex items-center justify-between">
       <!-- 过滤字段 -->
       <div class="flex flex-1 items-center space-x-2">
-        <Input
-          v-for="filterColumn in filterColumns"
-          :key="filterColumn.accessorKey"
-          :placeholder="`过滤 ${filterColumn.header}...`"
-          :model-value="
-            (table
+        <Input v-for="filterColumn in filterColumns" :key="filterColumn.accessorKey"
+          :placeholder="`过滤 ${filterColumn.header}...`" :model-value="(table
               .getColumn(filterColumn.accessorKey)
               ?.getFilterValue() as string) ?? ''
-          "
-          class="h-8 w-[150px] lg:w-[250px]"
-          @input="
+            " class="h-8 w-[150px] lg:w-[250px]" @input="
             (e) =>
               table
                 .getColumn(filterColumn.accessorKey)
                 ?.setFilterValue(e.target.value)
-          "
-        />
+          " />
         <!-- 状态筛选下拉菜单（动态渲染） -->
         <template v-if="isStatusFilterEnabled">
           <DropdownMenu class="w-[120px]">
@@ -32,36 +25,24 @@
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
-              <DropdownMenuCheckboxItem
-                value="all"
-                :checked="filterStatus === 'all'"
-                @update:checked="
-                  (value) => (filterStatus = value ? 'all' : undefined)
-                "
-              >
+              <DropdownMenuCheckboxItem value="all" :checked="filterStatus === 'all'" @update:checked="
+                (value) => (filterStatus = value ? 'all' : undefined)
+              ">
                 全部
               </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                v-for="option in props.statusOptions || []"
-                :key="option.value"
-                :value="option.value"
-                :checked="filterStatus === option.value"
-                @update:checked="
+              <DropdownMenuCheckboxItem v-for="option in props.statusOptions || []" :key="option.value"
+                :value="option.value" :checked="filterStatus === option.value" @update:checked="
                   (value) => (filterStatus = value ? option.value : undefined)
-                "
-              >
+                ">
                 {{ option.label }}
               </DropdownMenuCheckboxItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </template>
 
-        <Button
-          v-if="isFiltered || (isStatusFilterEnabled && filterStatus !== 'all')"
-          variant="ghost"
-          class="h-8 px-2 lg:px-3"
-          @click="resetFilters"
-        >
+        <Button v-if="isFiltered || (isStatusFilterEnabled && filterStatus !== 'all')" class="h-8 px-2 lg:px-3"
+          @click="resetFilters">
+          <!-- variant="ghost" -->
           重置
           <Icon name="i-radix-icons-cross-2" class="ml-2 h-4 w-4" />
         </Button>
@@ -75,28 +56,16 @@
         </NuxtLink>
         <DropdownMenu>
           <DropdownMenuTrigger as-child>
-            <Button
-              variant="outline"
-              size="sm"
-              class="ml-auto hidden h-8 lg:flex"
-            >
-              <Icon
-                name="i-radix-icons-mixer-horizontal"
-                class="mr-2 h-4 w-4"
-              />
+            <Button variant="outline" size="sm" class="ml-auto hidden h-8 lg:flex">
+              <Icon name="i-radix-icons-mixer-horizontal" class="mr-2 h-4 w-4" />
               View
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" class="w-[150px]">
             <DropdownMenuLabel>切换列</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuCheckboxItem
-              v-for="column in toggleColumns"
-              :key="column.id"
-              class="capitalize"
-              :checked="column.getIsVisible()"
-              @update:checked="(value) => column.toggleVisibility(!!value)"
-            >
+            <DropdownMenuCheckboxItem v-for="column in toggleColumns" :key="column.id" class="capitalize"
+              :checked="column.getIsVisible()" @update:checked="(value) => column.toggleVisibility(!!value)">
               {{ column.columnDef.header }}
             </DropdownMenuCheckboxItem>
           </DropdownMenuContent>
@@ -107,37 +76,21 @@
     <div class="border rounded-md">
       <Table>
         <TableHeader>
-          <TableRow
-            v-for="headerGroup in table.getHeaderGroups()"
-            :key="headerGroup.id"
-          >
+          <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
             <TableHead v-for="header in headerGroup.headers" :key="header.id">
-              <DataTableColumnHeader
-                v-if="!header.isPlaceholder && header.column.columnDef.header"
-                :column="header.column"
-                :title="header.column.columnDef.header"
-                class="cursor-pointer"
-              />
-              <FlexRender
-                v-else-if="!header.isPlaceholder"
-                :render="header.column.columnDef.header"
-                :props="header.getContext()"
-              />
+              <DataTableColumnHeader v-if="!header.isPlaceholder && header.column.columnDef.header"
+                :column="header.column" :title="header.column.columnDef.header" class="cursor-pointer" />
+              <FlexRender v-else-if="!header.isPlaceholder" :render="header.column.columnDef.header"
+                :props="header.getContext()" />
             </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           <template v-if="table.getRowModel().rows?.length">
-            <TableRow
-              v-for="row in table.getRowModel().rows"
-              :key="row.id"
-              :data-state="row.getIsSelected() && 'selected'"
-            >
+            <TableRow v-for="row in table.getRowModel().rows" :key="row.id"
+              :data-state="row.getIsSelected() && 'selected'">
               <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
-                <FlexRender
-                  :render="cell.column.columnDef.cell"
-                  :props="cell.getContext()"
-                />
+                <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
               </TableCell>
             </TableRow>
           </template>
@@ -195,9 +148,27 @@ const columnFilters = ref<ColumnFiltersState>([]);
 const columnVisibility = ref<VisibilityState>({});
 const rowSelection = ref({});
 
+// 计算过滤后的数据
+const filteredData = computed(() => {
+  let result = props.data;
+
+  // 应用状态筛选
+  if (
+    props.statusFilterField &&
+    filterStatus.value !== "all" &&
+    filterStatus.value !== undefined
+  ) {
+    result = result.filter(
+      (row) => String(row[props.statusFilterField!]) === filterStatus.value
+    );
+  }
+
+  return result;
+});
+
 const table = useVueTable({
   get data() {
-    return props.data;
+    return filteredData.value;
   },
   get columns() {
     return props.columns;
@@ -225,54 +196,30 @@ const table = useVueTable({
   onRowSelectionChange: (updaterOrValue) =>
     valueUpdater(updaterOrValue, rowSelection),
   getCoreRowModel: getCoreRowModel(),
-  // DataTable.vue 中的 getFilteredRowModel
-   getFilteredRowModel: getFilteredRowModel(),
-  // getFilteredRowModel: getFilteredRowModel((row) => {
-  //   // 文本过滤：检查是否匹配任何过滤列
-  //   const textFilterPasses = row.getIsFilteredByAnyColumn(); // 直接使用表格内置的文本过滤
-
-  //   // 状态过滤：单独处理状态字段
-  //   let statusFilterPasses = true;
-  //   if (props.statusFilterField) {
-  //     // 确保启用状态筛选
-  //     const rowStatus = row.original[props.statusFilterField]; // 获取行数据的状态值
-  //     const targetStatus = filterStatus.value;
-
-  //     if (targetStatus === "all") {
-  //       statusFilterPasses = true; // 显示所有状态
-  //     } else if (targetStatus !== undefined) {
-  //       // 筛选特定状态
-  //       statusFilterPasses = String(rowStatus) === targetStatus; // 转为字符串对比，避免类型问题
-  //     }
-  //   }
-
-  //   // 组合条件：文本过滤和状态过滤需同时满足
-  //   return textFilterPasses && statusFilterPasses;
-  // }),
+  getFilteredRowModel: getFilteredRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
   getSortedRowModel: getSortedRowModel(),
 });
-// 监听筛选状态变更，强制更新表格
-// watch(filterStatus, () => {
-//   table.setPagination({ page: 1 }); // 重置分页
-// });
-// 在 watch 中添加对数据变化的监听
+
+// 监听筛选状态变更，重置分页到第一页
+watch(filterStatus, () => {
+  table.setPageIndex(0);
+});
+
+// 监听数据变化，重置分页
 watch(
   () => props.data,
   () => {
-    table.setPagination({
-      page: 1,
-      pageSize: table.getState().pagination.pageSize,
-    }); // 数据变化时重置分页
+    table.setPageIndex(0);
   },
   { deep: true }
 );
+
 // 重置所有筛选（包括状态和文本过滤）
 const resetFilters = () => {
   table.resetColumnFilters(); // 清除文本过滤
   filterStatus.value = "all"; // 重置状态筛选
-  // table.setPagination({ page: 1 }); // 重置分页（可选）
-  // 无需调用更新方法，状态变更会自动触发表格更新
+  table.setPageIndex(0); // 重置分页到第一页
 };
 
 // 状态标签映射函数
