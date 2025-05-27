@@ -6,10 +6,10 @@
   <div class="pb-16 space-y-6">
     <div class="space-y-0.5">
       <h2 class="text-2xl font-bold tracking-tight">
-        Settings
+        设置
       </h2>
       <p class="text-muted-foreground">
-        Manage your account settings and set e-mail preferences.
+        管理您的账户信息、偏好设置和其他相关选项。
       </p>
     </div>
     <Separator class="my-6" />

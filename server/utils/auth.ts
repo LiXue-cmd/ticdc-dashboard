@@ -27,6 +27,6 @@ export async function requireAdmin(event: H3Event) {
   return session
 }
 
-export async function getSession(event: H3Event) {
-  return await getServerSession(event)
-}
+// export async function getSession(event: H3Event) {
+//   return await getServerSession(event)
+// }

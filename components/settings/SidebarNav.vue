@@ -10,25 +10,29 @@ const route = useRoute()
 
 const sidebarNavItems: Item[] = [
   {
-    title: 'Profile',
+    title: '基本信息',
     href: '/settings/profile',
   },
   {
-    title: 'Account',
-    href: '/settings/account',
+    title: '修改密码',
+    href: '/settings/changepassword',
   },
-  {
-    title: 'Appearance',
-    href: '/settings/appearance',
-  },
-  {
-    title: 'Notifications',
-    href: '/settings/notifications',
-  },
-  {
-    title: 'Display',
-    href: '/settings/display',
-  },
+  // {
+  //   title: 'Account',
+  //   href: '/settings/account',
+  // },
+  // {
+  //   title: 'Appearance',
+  //   href: '/settings/appearance',
+  // },
+  // {
+  //   title: 'Notifications',
+  //   href: '/settings/notifications',
+  // },
+  // {
+  //   title: 'Display',
+  //   href: '/settings/display',
+  // },
 ]
 </script>
 

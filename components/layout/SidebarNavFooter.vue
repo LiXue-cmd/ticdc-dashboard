@@ -88,11 +88,11 @@ const showModalTheme = ref(false)
                 <Icon name="i-lucide-github" />
                 Github Repository
               </NuxtLink>
-            </DropdownMenuItem>
+            </DropdownMenuItem> -->
             <DropdownMenuItem @click="showModalTheme = true">
               <Icon name="i-lucide-paintbrush" />
               主题
-            </DropdownMenuItem> -->
+            </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem @click="handleLogout">
