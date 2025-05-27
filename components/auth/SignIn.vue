@@ -3,21 +3,49 @@ import { Loader2 } from "lucide-vue-next";
 import PasswordInput from "~/components/PasswordInput.vue";
 import axios from "~/utils/axios";
 
-const username = ref("admin");
-const password = ref("admin");
-const isLoading = ref(false);
+definePageMeta({
+  auth: false,
+  layout: false
+})
+const { login, isAuthenticated } = useAuthStore()
+const router = useRouter()
 
+const username = ref("admin");
+const password = ref("admin123");
+const isLoading = ref(false);
+const error = ref('')
+
+// 如果已登录，重定向到首页
+watchEffect(() => {
+  if (isAuthenticated.value) {
+    router.push('/')
+  }
+})
 async function onSubmit(event: Event) {
   event.preventDefault();
-  if (!username.value || !password.value) return;
-  const res = await axios.post("/auth/login", {
-    username: username.value,
-    password: password.value,
-  });
-  console.log('res',res)
-  localStorage.setItem("accessToken", res.data.accessToken);
-  localStorage.setItem("refreshToken", res.data.refreshToken);
-  navigateTo("/");
+  if (!username.value || !password.value) {
+    error.value = '请填写账号和密码'
+    return
+  }
+  isLoading.value = true
+  error.value = ''
+
+  try {
+    const result = await login({
+      username: username.value,
+      password: password.value,
+    })
+    
+    if (result.success) {
+      await router.push('/')
+    } else {
+      error.value = result.error || '登录失败'
+    }
+  } catch (err) {
+    error.value = '发生错误，请稍后再试'
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
 
@@ -48,9 +76,12 @@ async function onSubmit(event: Event) {
       </div>
       <PasswordInput id="password" v-model="password" />
     </div>
+    <div v-if="error" class="text-red-600 text-sm text-center">
+      {{ error }}
+    </div>
     <Button type="submit" class="w-full" :disabled="isLoading">
       <Loader2 v-if="isLoading" class="mr-2 h-4 w-4 animate-spin" />
-      登 录
+      {{ isLoading ? '登 录 中...' : '登 录' }}
     </Button>
   </form>
 </template>

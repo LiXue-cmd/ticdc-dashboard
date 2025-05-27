@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { useSidebar } from '~/components/ui/sidebar'
-
-defineProps<{
-  user: {
-    name: string
-    email: string
-    avatar: string
-  }
-}>()
+const { user,logout } = useAuthStore()
+// defineProps<{
+//   user: {
+//     name: string
+//     email: string
+//     avatar: string
+//   }
+// }>()
 
 const { isMobile, setOpenMobile } = useSidebar()
 
-function handleLogout() {
-  navigateTo('/login')
+const handleLogout = async () => {
+  await logout()
 }
 
 const showModalTheme = ref(false)
@@ -60,30 +60,30 @@ const showModalTheme = ref(false)
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuGroup>
+          <!-- <DropdownMenuGroup>
             <DropdownMenuItem>
               <Icon name="i-lucide-sparkles" />
               Upgrade to Pro
             </DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
+          </DropdownMenuGroup> -->
+          <!-- <DropdownMenuSeparator /> -->
           <DropdownMenuGroup>
-            <DropdownMenuItem>
+            <!-- <DropdownMenuItem>
               <Icon name="i-lucide-badge-check" />
-              Account
-            </DropdownMenuItem>
+              账户
+            </DropdownMenuItem> -->
             <DropdownMenuItem as-child>
               <NuxtLink to="/settings" @click="setOpenMobile(false)">
                 <Icon name="i-lucide-settings" />
-                Settings
+                设置
               </NuxtLink>
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <!-- <DropdownMenuItem>
               <Icon name="i-lucide-bell" />
               Notifications
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem as-child>
+            <DropdownMenuSeparator /> -->
+            <!-- <DropdownMenuItem as-child>
               <NuxtLink to="https://github.com/dianprata/nuxt-shadcn-dashboard" external target="_blank">
                 <Icon name="i-lucide-github" />
                 Github Repository
@@ -91,13 +91,13 @@ const showModalTheme = ref(false)
             </DropdownMenuItem>
             <DropdownMenuItem @click="showModalTheme = true">
               <Icon name="i-lucide-paintbrush" />
-              Theme
-            </DropdownMenuItem>
+              主题
+            </DropdownMenuItem> -->
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem @click="handleLogout">
             <Icon name="i-lucide-log-out" />
-            Log out
+            退出登录
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import NumberFlow from "@number-flow/vue";
 import { Activity, CreditCard, DollarSign, Users } from "lucide-vue-next";
-
+definePageMeta({
+  middleware: 'auth'
+})
 const dataCard = ref({
   totalRevenue: 0,
   totalRevenueDesc: 0,

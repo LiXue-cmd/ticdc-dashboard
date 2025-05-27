@@ -11,11 +11,29 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@nuxtjs/color-mode',
     'nuxt-codemirror',
+    '@sidebase/nuxt-auth',
+    '@nuxtjs/tailwindcss'
   ],
 
-  css: [
-    '@unocss/reset/tailwind.css',
-  ],
+  auth: {
+    baseURL: process.env.AUTH_ORIGIN,
+    provider: {
+      type: 'authjs'
+    }
+  },
+
+  runtimeConfig: {
+    authSecret: process.env.NUXT_AUTH_SECRET,
+    jwtSecret: process.env.JWT_SECRET || 'your-jwt-secret-key',
+    public: {
+      authUrl: process.env.NUXT_AUTH_URL || 'http://localhost:3000/api/auth'
+    }
+  },
+
+  // css: [
+  //   '@unocss/reset/tailwind.css',
+  // ],
+  css: ['~/assets/css/main.css'],
 
   colorMode: {
     classSuffix: '',
