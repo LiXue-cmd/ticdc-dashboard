@@ -27,17 +27,17 @@ export const navMenu: NavMenu[] = [
       {
         title: '主密钥管理',
         icon: 'i-lucide-file-lock',
-        link: '/masterKeys',
+        link: '/masterkeys',
       },
       {
         title: '数据密钥管理',
         icon: 'i-lucide-key',
-        link: '/dataKeyManage'
+        link: '/datakeymanage'
       },
       {
         title: '密钥别名管理',
         icon: 'i-lucide-rectangle-ellipsis',
-        link: '/keyAliasManage'
+        link: '/keyaliasmanage'
       },
       // {
       //   title: '身份验证',
@@ -145,7 +145,7 @@ export const navMenu: NavMenu[] = [
       {
         title: '应用管理',
         icon: 'i-lucide-layout-grid',
-        link: '/appManage',
+        link: '/appmanage',
       }]
   },
   {
@@ -158,12 +158,12 @@ export const navMenu: NavMenu[] = [
           {
             title: '操作日志',
             icon: 'i-lucide-handshake',
-            link: '/operationLog',
+            link: '/operationlog',
           },
           {
             title: '接口日志',
             icon: 'i-lucide-cable',
-            link: '/interfaceLog',
+            link: '/interfacelog',
           }
         ]
       }]
@@ -178,22 +178,22 @@ export const navMenu: NavMenu[] = [
           {
             title: '用户管理',
             icon: 'i-lucide-circle',
-            link: '/userManage',
+            link: '/usermanage',
           },
           {
             title: '数据备份',
             icon: 'i-lucide-user',
-            link: '/dataBackup',
+            link: '/databackup',
           },
           {
             title: '系统根密钥轮换',
             icon: 'i-lucide-refresh-ccw',
-            link: '/rootKeyRotation',
+            link: '/rootkeyrotation',
           },
           {
             title: '加密设备配置',
             icon: 'i-lucide-monitor-cog',
-            link: '/encryDeviceConfig',
+            link: '/encrydeviceconfig',
           }
         ]
       }]

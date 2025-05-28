@@ -1,106 +1,120 @@
 <script setup lang="ts">
+import { cn } from '@/lib/utils'
 import { toTypedSchema } from '@vee-validate/zod'
-import { useForm } from 'vee-validate'
-import { h } from 'vue'
+import { FieldArray, useForm } from 'vee-validate'
+import { h, ref } from 'vue'
 import * as z from 'zod'
 import { toast } from '~/components/ui/toast'
 
-const passwordFormSchema = toTypedSchema(z.object({
-  currentPassword: z.string().min(8, {
-    message: '密码长度至少为8个字符',
-  }),
-  newPassword: z
+const verifiedEmails = ref(['m@example.com', 'm@google.com', 'm@support.com'])
+
+const profileFormSchema = toTypedSchema(z.object({
+  username: z
     .string()
-    .min(8, {
-      message: '新密码长度至少为8个字符',
+    .min(2, {
+      message: 'Username must be at least 2 characters.',
     })
-    .refine((value) => {
-      // 密码必须包含大小写字母和数字
-      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/
-      return regex.test(value)
-    }, {
-      message: '新密码必须包含至少一个大写字母、一个小写字母和一个数字',
+    .max(30, {
+      message: 'Username must not be longer than 30 characters.',
     }),
-  confirmPassword: z.string().min(8, {
-    message: '确认密码长度至少为8个字符',
-  }),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: '两次输入的新密码不一致',
-  path: ['confirmPassword'],
+  email: z
+    .string({
+      required_error: 'Please select an email to display.',
+    })
+    .email(),
+  bio: z.string().max(160, { message: 'Bio must not be longer than 160 characters.' }).min(4, { message: 'Bio must be at least 2 characters.' }),
+  urls: z
+    .array(
+      z.object({
+        value: z.string().url({ message: 'Please enter a valid URL.' }),
+      }),
+    )
+    .optional(),
 }))
 
-const { handleSubmit, resetForm, values } = useForm({
-  validationSchema: passwordFormSchema,
+const { handleSubmit, resetForm } = useForm({
+  validationSchema: profileFormSchema,
+  initialValues: {
+    bio: 'I own a computer.',
+    urls: [
+      { value: 'https://shadcn.com' },
+      { value: 'http://twitter.com/shadcn' },
+    ],
+  },
 })
 
 const onSubmit = handleSubmit((values) => {
-  // 这里处理密码修改逻辑
-  console.log('提交的密码修改值:', values)
-  
   toast({
-    title: '密码修改成功',
-    description: '您的密码已成功更新。',
-    variant: 'success',
+    title: 'You submitted the following values:',
+    description: h('pre', { class: 'mt-2 w-[340px] rounded-md bg-slate-950 p-4' }, h('code', { class: 'text-white' }, JSON.stringify(values, null, 2))),
   })
-  
-  // 重置表单
-  resetForm()
 })
 </script>
 
 <template>
   <div>
     <h3 class="text-lg font-medium">
-      修改密码
+      个人资料
     </h3>
     <p class="text-sm text-muted-foreground">
-      请输入当前密码和新密码来修改您的账户密码。
+      这里是您的个人资料信息。您可以在此处更新您的用户名、电子邮件地址和个人简介等信息。
     </p>
   </div>
   <Separator />
   <form class="space-y-8" @submit="onSubmit">
-    <FormField v-slot="{ componentField }" name="currentPassword">
+    <FormField v-slot="{ componentField }" name="username">
       <FormItem>
-        <FormLabel>当前密码</FormLabel>
+        <FormLabel>账户名</FormLabel>
         <FormControl>
-          <Input type="password" placeholder="请输入当前密码" v-bind="componentField" />
+          <Input type="text" placeholder="请输入账户名" v-bind="componentField" />
         </FormControl>
         <FormDescription>
-          输入您当前的账户密码。
+          这里是您的账户名。它将显示在您的个人资料页面上。
         </FormDescription>
         <FormMessage />
       </FormItem>
     </FormField>
 
-    <FormField v-slot="{ componentField }" name="newPassword">
+    <FormField v-slot="{ componentField }" name="email">
       <FormItem>
-        <FormLabel>新密码</FormLabel>
-        <FormControl>
-          <Input type="password" placeholder="请输入新密码" v-bind="componentField" />
-        </FormControl>
+        <FormLabel>邮箱</FormLabel>
+
+        <Select v-bind="componentField">
+          <FormControl>
+            <SelectTrigger>
+              <SelectValue placeholder="选择一个邮箱" />
+            </SelectTrigger>
+          </FormControl>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem v-for="email in verifiedEmails" :key="email" :value="email">
+                {{ email }}
+              </SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
         <FormDescription>
-          新密码必须至少包含8个字符，并包含大小写字母和数字。
+          请选择一个邮箱地址。
         </FormDescription>
         <FormMessage />
       </FormItem>
     </FormField>
 
-    <FormField v-slot="{ componentField }" name="confirmPassword">
+    <FormField v-slot="{ componentField }" name="bio">
       <FormItem>
-        <FormLabel>确认新密码</FormLabel>
+        <FormLabel>备注</FormLabel>
         <FormControl>
-          <Input type="password" placeholder="请再次输入新密码" v-bind="componentField" />
+          <Textarea placeholder="Tell us a little bit about yourself" v-bind="componentField" />
         </FormControl>
         <FormDescription>
-          再次输入新密码以确认。
+          这里是您的个人简介。它将显示在您的个人资料页面上。
         </FormDescription>
         <FormMessage />
       </FormItem>
     </FormField>
-    
     <div class="flex justify-start gap-2">
       <Button type="submit">
-        修改密码
+        更新个人资料
       </Button>
 
       <Button
@@ -112,4 +126,4 @@ const onSubmit = handleSubmit((values) => {
       </Button>
     </div>
   </form>
-</template>  
+</template>

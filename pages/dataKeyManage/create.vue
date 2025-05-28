@@ -1,4 +1,4 @@
-<!-- /dataKeyManage/create.vue -->
+<!-- /datakeymanage/create.vue -->
 <template>
   <div class="w-full max-w-2xl mx-auto p-6">
     <h2 class="text-2xl font-bold mb-4">新增数据密钥</h2>
@@ -103,7 +103,7 @@ const newKey = ref({
 });
 
 const goBack = async () => {
-  router.push("/dataKeyManage");
+  router.push("/datakeymanage");
 };
 // 提交表单
 const handleSubmit = async () => {
@@ -138,7 +138,7 @@ const handleSubmit = async () => {
         description: "数据密钥创建成功",
         variant: "default",
       });
-      router.push("/dataKeyManage"); // 创建成功后返回列表页
+      router.push("/datakeymanage"); // 创建成功后返回列表页
       // 重置表单
       resetForm();
     }
@@ -180,7 +180,7 @@ const mapKeyType = (keyType: string) => {
 watch(
   () => router.currentRoute.value.path,
   (newPath) => {
-    if (newPath === "/dataKeyManage/create") {
+    if (newPath === "/datakeymanage/create") {
       resetForm();
     }
   },

@@ -17,7 +17,7 @@
       :filterColumns="filterColumns"
       :is-loading="isLoading"
       no-data-text="暂无应用数据"
-      addTaskRoute="/appManage/create"
+      addTaskRoute="/appmanage/create"
       addTaskText="新增应用"
     />
 
@@ -75,7 +75,7 @@ const router = useRouter();
 const { toast } = useToast();
 const isLoading = ref(false);
 const searchQuery = ref("");
-const appManage = ref<any[]>([
+const appmanage = ref<any[]>([
   {
     id: 1,
     name: "系统应用",
@@ -114,7 +114,7 @@ const filterColumns = ref([{ accessorKey: "name", header: "应用名称" }]);
 
 // 计算属性：过滤后的数据
 const filteredTags = computed(() => {
-  return appManage.value.filter((tag) =>
+  return appmanage.value.filter((tag) =>
     tag.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
 });
@@ -227,9 +227,9 @@ onMounted(() => {
 async function loadTags() {
   isLoading.value = true;
   try {
-    const { data } = await useFetch("/api/appManage");
+    const { data } = await useFetch("/api/appmanage");
     if (data.value) {
-      appManage.value = data.value;
+      appmanage.value = data.value;
     }
   } catch (error) {
     toast({
@@ -244,7 +244,7 @@ async function loadTags() {
 
 // 新增/编辑页面跳转
 const editTag = (id: number) => {
-  router.push(`/appManage/edit/${id}`);
+  router.push(`/appmanage/edit/${id}`);
 };
 
 // 删除流程
@@ -263,7 +263,7 @@ const handleDeleteTag = async () => {
   if (!id) return;
 
   try {
-    const { error } = await useFetch(`/api/appManage/${id}`, {
+    const { error } = await useFetch(`/api/appmanage/${id}`, {
       method: "DELETE",
     });
 
@@ -274,7 +274,7 @@ const handleDeleteTag = async () => {
         variant: "destructive",
       });
     } else {
-      appManage.value = appManage.value.filter((tag) => tag.id !== id);
+      appmanage.value = appmanage.value.filter((tag) => tag.id !== id);
       toast({
         description: "应用已成功删除！",
         variant: "default",
@@ -307,7 +307,7 @@ const handleResetAppSecret = () => {
   if (!id) return;
 
   // 模拟重置逻辑（实际需调用API）
-  appManage.value = appManage.value.map((app) =>
+  appmanage.value = appmanage.value.map((app) =>
     app.id === id ? { ...app, appSecret: generateNewSecret() } : app
   );
 
@@ -325,7 +325,7 @@ const generateNewSecret = () => {
 };
 
 const updateStatus = (task: any, targetStatus: string) => {
-  const index = appManage.value.findIndex(
+  const index = appmanage.value.findIndex(
     (item) => item.invoice === task.invoice
   );
   if (index === -1) {
@@ -339,11 +339,11 @@ const updateStatus = (task: any, targetStatus: string) => {
     status: targetStatus,
   };
 
-  // 更新 appManage 数组，触发响应式更新
-  appManage.value = [
-    ...appManage.value.slice(0, index),
+  // 更新 appmanage 数组，触发响应式更新
+  appmanage.value = [
+    ...appmanage.value.slice(0, index),
     newTask,
-    ...appManage.value.slice(index + 1),
+    ...appmanage.value.slice(index + 1),
   ];
 };
 </script>

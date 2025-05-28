@@ -302,13 +302,13 @@ async function saveAssociations() {
     description: "关联已保存成功！",
     variant: "default",
   });
-  router.push("/keyAliasManage");
+  router.push("/keyaliasmanage");
 }
 
 // 返回上一页
 function goBack() {
   router.back();
-  // router.push("/keyAliasManage")
+  // router.push("/keyaliasmanage")
 }
 
 // 删除关联（模拟接口调用）

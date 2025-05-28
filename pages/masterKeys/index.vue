@@ -1,4 +1,4 @@
-<!-- /masterKeys/index.vue -->
+<!-- /masterkeys/index.vue -->
 <template>
   <div class="w-full flex flex-col items-stretch gap-4">
     <div class="flex flex-wrap items-end justify-between gap-2">
@@ -9,9 +9,9 @@
     </div>
     <DataTable
       :columns="columns"
-      :data="masterKeys"
+      :data="masterkeys"
       :filterColumns="filterColumns"
-      addTaskRoute="/masterKeys/create"
+      addTaskRoute="/masterkeys/create"
       addTaskText="新增主密钥"
       :statusFilterField="'status'"
       :statusOptions="[
@@ -39,7 +39,7 @@ const filterColumns = ref([
   { accessorKey: "keyAlias", header: "密钥别名" },
   { accessorKey: "algorithm", header: "算法" },
 ]);
-const masterKeys = ref<any[]>([
+const masterkeys = ref<any[]>([
   {
     invoice: "MK-2023001",
     keyAlias: "系统默认密钥",
@@ -197,11 +197,11 @@ const columns: ColumnDef<any>[] = [
 ];
 
 async function loadMasterKeys() {
-  const { data: feeds } = await useFetch("/api/cdc/masterKeys");
+  const { data: feeds } = await useFetch("/api/cdc/masterkeys");
   if (feeds.value) {
-    masterKeys.value = feeds.value;
+    masterkeys.value = feeds.value;
   }
-  console.debug("masterKeys", masterKeys.value);
+  console.debug("masterkeys", masterkeys.value);
 }
 
 onMounted(async () => {
@@ -211,11 +211,11 @@ onMounted(async () => {
 const openDetailModal = (invoice: any) => {
   // 这里可以添加打开详情弹窗的逻辑
   console.log("Open detail modal for", invoice);
-  router.push(`/masterKeys/details/${invoice}`);
+  router.push(`/masterkeys/details/${invoice}`);
 };
 
 const updateStatus = (task: any, targetStatus: string) => {
-  const index = masterKeys.value.findIndex(
+  const index = masterkeys.value.findIndex(
     (item) => item.invoice === task.invoice
   );
   if (index === -1) {
@@ -229,11 +229,11 @@ const updateStatus = (task: any, targetStatus: string) => {
     status: targetStatus,
   };
 
-  // 更新 masterKeys 数组，触发响应式更新
-  masterKeys.value = [
-    ...masterKeys.value.slice(0, index),
+  // 更新 masterkeys 数组，触发响应式更新
+  masterkeys.value = [
+    ...masterkeys.value.slice(0, index),
     newTask,
-    ...masterKeys.value.slice(index + 1),
+    ...masterkeys.value.slice(index + 1),
   ];
 };
 </script>

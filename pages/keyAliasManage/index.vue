@@ -8,9 +8,9 @@
     </div>
     <DataTable
       :columns="columns"
-      :data="keyAliasManage"
+      :data="keyaliasmanage"
       :filterColumns="filterColumns"
-      addTaskRoute="/keyAliasManage/create"
+      addTaskRoute="/keyaliasmanage/create"
       addTaskText="新增密钥别名"
     />
      <!-- 删除确认对话框 -->
@@ -63,7 +63,7 @@ const deletingItem = ref<any>({}); // 当前正在删除的项
 const filterColumns = ref([
   { accessorKey: "keyAlias", header: "密钥别名" },
 ]);
-const keyAliasManage = ref<any[]>([
+const keyaliasmanage = ref<any[]>([
   {
     invoice: "MK-2023001",
     keyAlias: "系统默认密钥",
@@ -158,11 +158,11 @@ const columns: ColumnDef<any>[] = [
 ];
 
 async function loadMasterKeys() {
-  const { data: feeds } = await useFetch("/api/cdc/keyAliasManage");
+  const { data: feeds } = await useFetch("/api/cdc/keyaliasmanage");
   if (feeds.value) {
-    keyAliasManage.value = feeds.value;
+    keyaliasmanage.value = feeds.value;
   }
-  console.debug("keyAliasManage", keyAliasManage.value);
+  console.debug("keyaliasmanage", keyaliasmanage.value);
 }
 
 onMounted(async () => {
@@ -173,8 +173,8 @@ onMounted(async () => {
 const openEditModal = (invoice: any) => {
   // 这里可以添加打开详情弹窗的逻辑
   console.log("Open detail modal for", invoice);
-  router.push(`/keyAliasManage/association/${invoice}`);
-  // router.push({ name: 'keyAliasManage/association', params: { id: invoice } });
+  router.push(`/keyaliasmanage/association/${invoice}`);
+  // router.push({ name: 'keyaliasmanage/association', params: { id: invoice } });
 };
 
 // 打开删除确认弹窗
@@ -206,7 +206,7 @@ async function handleConfirmDelete() {
         variant: "destructive",
       });
     } else {
-      keyAliasManage.value = keyAliasManage.value.filter(
+      keyaliasmanage.value = keyaliasmanage.value.filter(
         (item) => item.invoice !== invoice
       );
       toast({

@@ -65,7 +65,7 @@
       </div>
     </div>
     <div class="flex justify-end mt-6">
-      <NuxtLink to="/dataKeyManage">
+      <NuxtLink to="/datakeymanage">
         <Button type="button">返回列表</Button>
       </NuxtLink>
     </div>
@@ -103,7 +103,7 @@ onMounted(async () => {
   if (!invoice) return;
 
   // 模拟接口请求（实际需替换为真实API）
-  const { data, error } = await useFetch(`/api/cdc/dataKeyManage/${invoice}`);
+  const { data, error } = await useFetch(`/api/cdc/datakeymanage/${invoice}`);
 
   if (error.value) {
     console.error("获取密钥详情失败:", error.value);

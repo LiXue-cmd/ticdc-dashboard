@@ -75,11 +75,11 @@ const errors = ref<{
 // 生命周期：加载应用详情
 onMounted(async () => {
   const tagId = route.params.id as string;
-  if (!tagId) return router.push("/appManage"); // 无ID时返回列表页
+  if (!tagId) return router.push("/appmanage"); // 无ID时返回列表页
 
   try {
     isLoading.value = true;
-    const { data, error } = await useFetch(`/api/appManage/${tagId}`);
+    const { data, error } = await useFetch(`/api/appmanage/${tagId}`);
     
     if (error.value) {
       toast({
@@ -87,7 +87,7 @@ onMounted(async () => {
         description: error.value.statusMessage,
         variant: "destructive",
       });
-      return router.push("/appManage");
+      return router.push("/appmanage");
     }
 
     form.value = data.value || { id: 0, name: "", description: "" };
@@ -98,7 +98,7 @@ onMounted(async () => {
       description: "获取应用详情时出错",
       variant: "destructive",
     });
-    router.push("/appManage");
+    router.push("/appmanage");
   } finally {
     isLoading.value = false;
   }
@@ -141,7 +141,7 @@ const handleSubmit = async () => {
   isLoading.value = true;
 
   try {
-    const { data, error } = await useFetch(`/api/appManage/${tagId}`, {
+    const { data, error } = await useFetch(`/api/appmanage/${tagId}`, {
       method: "PUT",
       body: {
         name: form.value.name,
@@ -158,7 +158,7 @@ const handleSubmit = async () => {
         description: "应用更新成功！",
         variant: "default",
       });
-      router.push("/appManage"); // 保存后返回列表页
+      router.push("/appmanage"); // 保存后返回列表页
     }
   } catch (err: any) {
     toast({

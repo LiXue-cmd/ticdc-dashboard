@@ -1,4 +1,4 @@
-<!-- /dataKeyManage/index.vue -->
+<!-- /datakeymanage/index.vue -->
 <template>
   <div class="w-full flex flex-col items-stretch gap-4">
     <div class="flex flex-wrap items-end justify-between gap-2">
@@ -9,9 +9,9 @@
     </div>
     <DataTable
       :columns="columns"
-      :data="dataKeyManage"
+      :data="datakeymanage"
       :filterColumns="filterColumns"
-      addTaskRoute="/dataKeyManage/create"
+      addTaskRoute="/datakeymanage/create"
       addTaskText="新增数据密钥"
       :statusFilterField="'status'"
       :statusOptions="[
@@ -39,7 +39,7 @@ const filterColumns = ref([
   { accessorKey: "keyAlias", header: "密钥别名" },
   { accessorKey: "algorithm", header: "算法" },
 ]);
-const dataKeyManage = ref<any[]>([
+const datakeymanage = ref<any[]>([
   {
     invoice: "MK-2023001",
     keyAlias: "系统默认密钥",
@@ -197,11 +197,11 @@ const columns: ColumnDef<any>[] = [
 ];
 
 async function loadMasterKeys() {
-  const { data: feeds } = await useFetch("/api/cdc/dataKeyManage");
+  const { data: feeds } = await useFetch("/api/cdc/datakeymanage");
   if (feeds.value) {
-    dataKeyManage.value = feeds.value;
+    datakeymanage.value = feeds.value;
   }
-  console.debug("dataKeyManage", dataKeyManage.value);
+  console.debug("datakeymanage", datakeymanage.value);
 }
 
 onMounted(async () => {
@@ -211,11 +211,11 @@ onMounted(async () => {
 const openDetailModal = (invoice: any) => {
   // 这里可以添加打开详情弹窗的逻辑
   console.log("Open detail modal for", invoice);
-  router.push(`/dataKeyManage/details/${invoice}`);
+  router.push(`/datakeymanage/details/${invoice}`);
 };
 
 const updateStatus = (task: any, targetStatus: string) => {
-  const index = dataKeyManage.value.findIndex(
+  const index = datakeymanage.value.findIndex(
     (item) => item.invoice === task.invoice
   );
   if (index === -1) {
@@ -229,11 +229,11 @@ const updateStatus = (task: any, targetStatus: string) => {
     status: targetStatus,
   };
 
-  // 更新 dataKeyManage 数组，触发响应式更新
-  dataKeyManage.value = [
-    ...dataKeyManage.value.slice(0, index),
+  // 更新 datakeymanage 数组，触发响应式更新
+  datakeymanage.value = [
+    ...datakeymanage.value.slice(0, index),
     newTask,
-    ...dataKeyManage.value.slice(index + 1),
+    ...datakeymanage.value.slice(index + 1),
   ];
 };
 </script>

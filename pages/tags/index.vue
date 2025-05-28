@@ -187,6 +187,7 @@ async function loadTags() {
 
 // 新增/编辑页面跳转
 const editTag = (id: number) => {
+  console.log("编辑标签 ID:", id);
   router.push(`/tags/edit/${id}`);
 };
 

@@ -37,8 +37,7 @@
         <Button variant="outline" @click="goBack">
           取消
         </Button>
-        <Button 
-          variant="primary" 
+        <Button
           :loading="isLoading"
           :disabled="isLoading || !form.name"
         >
@@ -54,7 +53,7 @@ import { ref, watch, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useToast } from "@/components/ui/toast/use-toast";
 import { useFetch } from "#app";
-import { Button, Input, Textarea } from "@/components/ui/dialog";
+// import { Button, Input, Textarea } from "@/components/ui/dialog";
 
 const router = useRouter();
 const route = useRoute();

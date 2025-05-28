@@ -107,7 +107,7 @@ const handleSubmit = async () => {
   isLoading.value = true;
 
   try {
-    const { data, error } = await useFetch("/api/appManage", {
+    const { data, error } = await useFetch("/api/appmanage", {
       method: "POST",
       body: form.value,
     });
@@ -121,7 +121,7 @@ const handleSubmit = async () => {
         description: "应用新增成功！",
         variant: "default",
       });
-      router.push("/appManage"); // 保存后返回列表页
+      router.push("/appmanage"); // 保存后返回列表页
     }
   } catch (err: any) {
     toast({

@@ -241,7 +241,7 @@ async function loadKeyAliasDetail() {
         description: "未找到该密钥别名",
         variant: "destructive",
       });
-      router.push("/keyAliasManage");
+      router.push("/keyaliasmanage");
     }
   } catch (error) {
     console.error("Error loading key alias detail:", error);
@@ -250,7 +250,7 @@ async function loadKeyAliasDetail() {
       description: "获取密钥别名信息时出错",
       variant: "destructive",
     });
-    router.push("/keyAliasManage");
+    router.push("/keyaliasmanage");
   }
 }
 
@@ -341,7 +341,7 @@ async function saveAssociations() {
         description: "关联已保存成功！",
         variant: "default",
       });
-      router.push("/keyAliasManage");
+      router.push("/keyaliasmanage");
     }
   } catch (error) {
     console.error("Error saving associations:", error);
@@ -356,7 +356,7 @@ async function saveAssociations() {
 // 返回上一页
 function goBack() {
   router.back();
-  // router.push("/keyAliasManage")
+  // router.push("/keyaliasmanage")
 }
 
 // 删除关联

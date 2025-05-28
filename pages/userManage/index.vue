@@ -17,7 +17,7 @@
       :filterColumns="filterColumns"
       :is-loading="isLoading"
       no-data-text="暂无用户数据"
-      addTaskRoute="/userManage/create"
+      addTaskRoute="/usermanage/create"
       addTaskText="新增用户"
     />
 
@@ -309,7 +309,7 @@ const loadUsers = async () => {
 
 // 编辑用户
 const editUser = (id: number) => {
-  router.push(`/userManage/edit/${id}`);
+  router.push(`/usermanage/edit/${id}`);
 };
 
 // 删除流程
