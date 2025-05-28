@@ -229,7 +229,7 @@ const columns: ColumnDef<any>[] = [
       const status = row.getValue("status");
       return h(Badge, {
         variant: "outline",
-        // class: status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800",
+        class: status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800",
       }, () => status === "active" ? "启用" : "禁用");
     },
     canSort: true,
