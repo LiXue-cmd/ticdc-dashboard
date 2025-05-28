@@ -34,23 +34,34 @@
 
         <div class="mt-4 flex justify-end gap-2">
           <Button variant="outline" @click="closeDeleteModal"> 取消 </Button>
-          <Button variant="destructive" @click="handleDeleteUser"> 删除 </Button>
+          <Button variant="destructive" @click="handleDeleteUser">
+            删除
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
 
     <!-- 修改密码对话框 -->
-    <Dialog :open="isChangePasswordModalOpen" on-close="closeChangePasswordModal">
+    <Dialog
+      :open="isChangePasswordModalOpen"
+      on-close="closeChangePasswordModal"
+    >
       <DialogContent class="w-80">
         <DialogTitle class="text-lg font-medium">修改密码</DialogTitle>
         <DialogDescription class="mt-2 text-muted-foreground">
-          为用户 <strong class="text-gray-900">{{ changingPasswordUser.name }}</strong> 修改登录密码
+          为用户
+          <strong class="text-gray-900">{{ changingPasswordUser.name }}</strong>
+          修改登录密码
         </DialogDescription>
 
         <form @submit.prevent>
           <div class="mt-4 space-y-4">
             <div>
-              <label for="newPassword" class="block text-sm font-medium text-gray-700">新密码</label>
+              <label
+                for="newPassword"
+                class="block text-sm font-medium text-gray-700"
+                >新密码</label
+              >
               <Input
                 type="password"
                 id="newPassword"
@@ -60,7 +71,11 @@
               />
             </div>
             <div>
-              <label for="confirmPassword" class="block text-sm font-medium text-gray-700">确认密码</label>
+              <label
+                for="confirmPassword"
+                class="block text-sm font-medium text-gray-700"
+                >确认密码</label
+              >
               <Input
                 type="password"
                 id="confirmPassword"
@@ -72,8 +87,12 @@
           </div>
 
           <div class="mt-4 flex justify-end gap-2">
-            <Button variant="outline" @click="closeChangePasswordModal"> 取消 </Button>
-            <Button type="submit" @click="handleChangePassword"> 确认修改 </Button>
+            <Button variant="outline" @click="closeChangePasswordModal">
+              取消
+            </Button>
+            <Button type="submit" @click="handleChangePassword">
+              确认修改
+            </Button>
           </div>
         </form>
       </DialogContent>
@@ -168,10 +187,10 @@ const filterColumns = ref([{ accessorKey: "name", header: "用户名称" }]);
 // 计算属性：过滤后的数据
 const filteredUsers = computed(() => {
   if (!Array.isArray(users.value)) {
-    console.error('users.value 不是数组:', users.value);
+    console.error("users.value 不是数组:", users.value);
     return [];
   }
-  
+
   return users.value.filter((user) =>
     user.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
@@ -227,10 +246,17 @@ const columns: ColumnDef<any>[] = [
     header: "状态",
     cell: ({ row }) => {
       const status = row.getValue("status");
-      return h(Badge, {
-        variant: "outline",
-        class: status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800",
-      }, () => status === "active" ? "启用" : "禁用");
+      return h(
+        Badge,
+        {
+          variant: "outline",
+          class:
+            status === "active"
+              ? "bg-green-100 text-green-800"
+              : "bg-red-100 text-red-800",
+        },
+        () => (status === "active" ? "启用" : "禁用")
+      );
     },
     canSort: true,
   },
@@ -246,13 +272,22 @@ const columns: ColumnDef<any>[] = [
           onClick: (user) => editUser(user.id),
           variant: "outline",
         },
-        {
-          type: "submenu",
-          label: "状态",
-          subType: "status",
-          statuses: ["active", "inactive"],
-          onStatusChange: (user, status) => updateStatus(user, status),
-        },
+        // 根据当前状态显示启用或禁用按钮
+        row.getValue("status") === "active"
+          ? {
+              type: "action",
+              label: "禁用",
+              icon: "i-radix-icons-toggle-off",
+              onClick: (task) => updateStatus(task, "inactive"),
+              class: "text-red-600 hover:bg-red-50", // 添加红色样式
+            }
+          : {
+              type: "action",
+              label: "启用",
+              icon: "i-radix-icons-toggle-on",
+              onClick: (task) => updateStatus(task, "active"),
+              class: "text-green-600 hover:bg-green-50", // 添加绿色样式
+            },
         {
           type: "action",
           label: "修改密码",
@@ -268,7 +303,11 @@ const columns: ColumnDef<any>[] = [
           variant: "destructive",
         },
       ];
-      return h(DataTableRowActions, { row, actions, iconName: "i-radix-icons-dots-horizontal" });
+      return h(DataTableRowActions, {
+        row,
+        actions,
+        iconName: "i-radix-icons-dots-horizontal",
+      });
     },
     canHide: true,
   },
@@ -280,21 +319,21 @@ onMounted(() => loadUsers());
 // 数据加载 - 使用模拟数据
 const loadUsers = async () => {
   isLoading.value = true;
-  
+
   try {
     // 模拟API请求延迟
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
     // 使用模拟数据
     users.value = mockUsers;
-    
+
     toast({
       title: "数据加载成功",
       description: "已使用模拟数据",
       variant: "default",
     });
   } catch (error) {
-    console.error('获取用户列表失败:', error);
+    console.error("获取用户列表失败:", error);
     // 出错时仍使用模拟数据
     users.value = mockUsers;
     toast({
@@ -326,24 +365,32 @@ const closeDeleteModal = () => {
 const handleDeleteUser = async () => {
   const { id } = deletingUser.value;
   if (!id) return;
-  
+
   try {
     // 模拟API请求延迟
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     // 从本地数据中删除
     if (Array.isArray(users.value)) {
-      users.value = users.value.filter(user => user.id !== id);
+      users.value = users.value.filter((user) => user.id !== id);
       toast({ description: "用户删除成功", variant: "default" });
     } else {
-      console.error('删除用户时 users.value 不是数组');
-      toast({ title: "操作失败", description: "用户数据格式错误", variant: "destructive" });
+      console.error("删除用户时 users.value 不是数组");
+      toast({
+        title: "操作失败",
+        description: "用户数据格式错误",
+        variant: "destructive",
+      });
     }
-    
+
     closeDeleteModal();
   } catch (error) {
     console.error("删除失败:", error);
-    toast({ title: "系统错误", description: "处理删除请求时出错", variant: "destructive" });
+    toast({
+      title: "系统错误",
+      description: "处理删除请求时出错",
+      variant: "destructive",
+    });
   }
 };
 
@@ -363,10 +410,18 @@ const closeChangePasswordModal = () => {
 const handleChangePassword = async () => {
   // 密码验证
   if (newPassword.value.length < 6 || newPassword.value.length > 16) {
-    return toast({ title: "格式错误", description: "密码需6-16位", variant: "destructive" });
+    return toast({
+      title: "格式错误",
+      description: "密码需6-16位",
+      variant: "destructive",
+    });
   }
   if (newPassword.value !== confirmPassword.value) {
-    return toast({ title: "验证失败", description: "两次密码不一致", variant: "destructive" });
+    return toast({
+      title: "验证失败",
+      description: "两次密码不一致",
+      variant: "destructive",
+    });
   }
 
   const { id } = changingPasswordUser.value;
@@ -374,39 +429,47 @@ const handleChangePassword = async () => {
 
   try {
     // 模拟API请求
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    toast({ title: "修改成功", description: "请使用新密码登录", variant: "default" });
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    toast({
+      title: "修改成功",
+      description: "请使用新密码登录",
+      variant: "default",
+    });
     closeChangePasswordModal();
   } catch (error) {
     console.error("修改密码失败:", error);
-    toast({ title: "系统错误", description: "处理密码修改请求时出错", variant: "destructive" });
+    toast({
+      title: "系统错误",
+      description: "处理密码修改请求时出错",
+      variant: "destructive",
+    });
   }
 };
 
 // 更新用户状态
 const updateStatus = (user: any, status: string) => {
   if (!Array.isArray(users.value)) {
-    console.error('更新用户状态时 users.value 不是数组');
+    console.error("更新用户状态时 users.value 不是数组");
     return;
   }
-  
-  const index = users.value.findIndex(u => u.id === user.id);
+
+  const index = users.value.findIndex((u) => u.id === user.id);
   if (index === -1) return;
-  
+
   // 创建新对象更新状态
   const updatedUser = { ...users.value[index], status };
-  
+
   // 使用展开语法保持响应式更新
   users.value = [
     ...users.value.slice(0, index),
     updatedUser,
-    ...users.value.slice(index + 1)
+    ...users.value.slice(index + 1),
   ];
-  
+
   toast({
     title: "状态更新成功",
-    description: `${user.name} 已${status === 'active' ? '启用' : '禁用'}`,
+    description: `${user.name} 已${status === "active" ? "启用" : "禁用"}`,
     variant: "default",
   });
 };

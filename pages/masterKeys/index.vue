@@ -151,7 +151,10 @@ const columns: ColumnDef<any>[] = [
         Badge,
         {
           variant: "outline",
-          class: status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800',
+          class:
+            status === "active"
+              ? "bg-green-100 text-green-800"
+              : "bg-red-100 text-red-800",
         },
         () => (status === "active" ? "启用" : "禁用")
       );
@@ -177,13 +180,22 @@ const columns: ColumnDef<any>[] = [
         //   icon: "i-radix-icons-edit",
         //   onClick: (task) => openEditModal(task.invoice), // 添加编辑功能
         // },
-        {
-          type: "submenu",
-          label: "状态",
-          subType: "status",
-          statuses: ["active", "inactive"],
-          onStatusChange: (task, status) => updateStatus(task, status),
-        },
+        // 根据当前状态显示启用或禁用按钮
+        row.getValue("status") === "active"
+          ? {
+              type: "action",
+              label: "禁用",
+              icon: "i-radix-icons-toggle-off",
+              onClick: (task) => updateStatus(task, "inactive"),
+              class: "text-red-600 hover:bg-red-50", // 添加红色样式
+            }
+          : {
+              type: "action",
+              label: "启用",
+              icon: "i-radix-icons-toggle-on",
+              onClick: (task) => updateStatus(task, "active"),
+              class: "text-green-600 hover:bg-green-50", // 添加绿色样式
+            },
       ];
 
       return h(DataTableRowActions, {
