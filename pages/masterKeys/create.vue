@@ -13,14 +13,20 @@
           class="mt-1 block w-full"
         />
       </div>
+
+      <!-- 算法下拉选择 -->
       <div>
         <label class="block text-sm font-medium text-gray-700">算法</label>
-        <Input
-          type="text"
-          v-model="newKey.algorithm"
-          placeholder="请输入算法"
-          class="mt-1 block w-full"
-        />
+        <Select v-model="newKey.algorithm">
+          <SelectTrigger class="mt-1 w-full">
+            <SelectValue placeholder="请选择算法" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem v-for="algorithm in algorithmOptions" :key="algorithm.value" :value="algorithm.value">
+              {{ algorithm.label }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div>
@@ -45,14 +51,58 @@
         </RadioGroup>
       </div>
 
+      <!-- 标签多选下拉框 -->
       <div>
-        <label class="block text-sm font-medium text-gray-700">标签</label>
-        <Input
-          type="text"
-          v-model="newKey.tags"
-          placeholder="请输入标签，多个标签用逗号分隔"
-          class="mt-1 block w-full"
-        />
+        <label class="block text-sm font-medium text-gray-700 mb-2">标签</label>
+        
+        <!-- 已选择的标签显示 -->
+        <div class="flex flex-wrap gap-2 mb-2" v-if="selectedTags.length > 0">
+          <div
+            v-for="(tag, index) in selectedTags"
+            :key="index"
+            class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center gap-2"
+          >
+            {{ tag }}
+            <button
+              type="button"
+              @click="removeTag(index)"
+              class="text-blue-600 hover:text-blue-800 font-bold"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+
+        <!-- 标签选择下拉框 -->
+        <Select v-model="selectedTagFromDropdown" @update:modelValue="addTagFromDropdown">
+          <SelectTrigger class="mt-1 w-full">
+            <SelectValue placeholder="选择或添加标签" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem v-for="tag in availableTagOptions" :key="tag" :value="tag">
+              {{ tag }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+
+        <!-- 自定义标签输入 -->
+        <div class="flex gap-2 mt-2">
+          <Input
+            type="text"
+            v-model="customTag"
+            placeholder="输入自定义标签"
+            class="flex-1"
+            @keyup.enter="addCustomTag"
+          />
+          <Button
+            type="button"
+            @click="addCustomTag"
+            variant="outline"
+            size="sm"
+          >
+            添加
+          </Button>
+        </div>
       </div>
 
       <div>
@@ -84,12 +134,62 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import { useRouter } from "vue-router";
 import { toast } from "@/components/ui/toast";
 import { useFetch } from "#app";
 
 const router = useRouter();
+
+// 算法选项模拟数据
+const algorithmOptions = ref([
+  { label: "AES-256-GCM", value: "AES-256-GCM" },
+  { label: "AES-128-GCM", value: "AES-128-GCM" },
+  { label: "AES-256-CBC", value: "AES-256-CBC" },
+  { label: "AES-128-CBC", value: "AES-128-CBC" },
+  { label: "RSA-2048", value: "RSA-2048" },
+  { label: "RSA-4096", value: "RSA-4096" },
+  { label: "ECC-P256", value: "ECC-P256" },
+  { label: "ECC-P384", value: "ECC-P384" },
+  { label: "HMAC-SHA256", value: "HMAC-SHA256" },
+  { label: "HMAC-SHA512", value: "HMAC-SHA512" },
+  { label: "ChaCha20-Poly1305", value: "ChaCha20-Poly1305" },
+  { label: "3DES", value: "3DES" }
+]);
+
+// 预定义标签选项
+const predefinedTags = ref([
+  "生产环境",
+  "测试环境",
+  "开发环境",
+  "数据库加密",
+  "文件加密",
+  "通信加密",
+  "身份认证",
+  "数字签名",
+  "API密钥",
+  "会话密钥",
+  "高安全级别",
+  "中安全级别",
+  "低安全级别",
+  "临时使用",
+  "长期使用",
+  "备份密钥",
+  "主密钥",
+  "派生密钥"
+]);
+
+// 已选择的标签
+const selectedTags = ref([]);
+// 下拉框选择的标签
+const selectedTagFromDropdown = ref("");
+// 自定义标签输入
+const customTag = ref("");
+
+// 可选择的标签选项（排除已选择的）
+const availableTagOptions = computed(() => {
+  return predefinedTags.value.filter(tag => !selectedTags.value.includes(tag));
+});
 
 // 初始化表单数据
 const newKey = ref({
@@ -102,9 +202,40 @@ const newKey = ref({
   status: "active", // 默认启用
 });
 
+// 从下拉框添加标签
+const addTagFromDropdown = (tag) => {
+  if (tag && !selectedTags.value.includes(tag)) {
+    selectedTags.value.push(tag);
+    selectedTagFromDropdown.value = ""; // 重置下拉框选择
+    updateTagsString();
+  }
+};
+
+// 添加自定义标签
+const addCustomTag = () => {
+  const tag = customTag.value.trim();
+  if (tag && !selectedTags.value.includes(tag)) {
+    selectedTags.value.push(tag);
+    customTag.value = ""; // 清空输入框
+    updateTagsString();
+  }
+};
+
+// 删除标签
+const removeTag = (index) => {
+  selectedTags.value.splice(index, 1);
+  updateTagsString();
+};
+
+// 更新标签字符串（用于提交表单）
+const updateTagsString = () => {
+  newKey.value.tags = selectedTags.value.join(",");
+};
+
 const goBack = async () => {
   router.push("/masterkeys");
 };
+
 // 提交表单
 const handleSubmit = async () => {
   if (
@@ -150,6 +281,7 @@ const handleSubmit = async () => {
     });
   }
 };
+
 // 重置表单数据
 const resetForm = () => {
   newKey.value = {
@@ -161,7 +293,11 @@ const resetForm = () => {
     version: "v1.0",
     status: "active",
   };
+  selectedTags.value = [];
+  selectedTagFromDropdown.value = "";
+  customTag.value = "";
 };
+
 // 密钥类型映射函数（根据后端需求调整）
 const mapKeyType = (keyType: string) => {
   switch (keyType) {
@@ -204,5 +340,34 @@ input,
 textarea {
   padding: 0.5rem;
   border: 1px solid #e5e7eb;
+}
+
+/* 标签样式 */
+.tag-chip {
+  transition: all 0.2s ease-in-out;
+}
+
+.tag-chip:hover {
+  background-color: #dbeafe;
+}
+
+/* 修复选择框箭头位置 */
+:deep(.select-trigger) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+:deep([data-radix-select-trigger]) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+:deep([data-radix-select-icon]) {
+  position: absolute;
+  right: 12px;
+  pointer-events: none;
 }
 </style>
