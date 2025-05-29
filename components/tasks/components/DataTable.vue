@@ -58,7 +58,7 @@
           <DropdownMenuTrigger as-child>
             <Button variant="outline" size="sm" class="ml-auto hidden h-8 lg:flex">
               <Icon name="i-radix-icons-mixer-horizontal" class="mr-2 h-4 w-4" />
-              View
+              视图
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" class="w-[150px]">
