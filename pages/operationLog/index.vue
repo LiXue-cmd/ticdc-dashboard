@@ -16,6 +16,11 @@
       :filterColumns="filterColumns"
       no-data-text="暂无操作日志"
       class="mt-4"
+      :statusFilterField="'status'"
+      :statusOptions="[
+        { label: '成功', value: 'success' },
+        { label: '失败', value: 'error' },
+      ]"
     />
   </div>
 </template>
@@ -76,8 +81,8 @@ const logs = ref<any[]>([
 // 过滤配置
 const filterColumns = ref([
   { accessorKey: "operator", header: "操作人" },
-  { accessorKey: "operation", header: "操作类型" },
-  { accessorKey: "resource", header: "操作资源" },
+  // { accessorKey: "operation", header: "操作类型" },
+  // { accessorKey: "resource", header: "操作资源" },
 ]);
 
 // 计算属性：过滤后的数据
@@ -94,7 +99,7 @@ const columns: ColumnDef<any>[] = [
   {
     accessorKey: "timestamp",
     header: "操作时间",
-    cell: ({ row }) => h("div", { class: "w-32" }, row.getValue("timestamp")),
+    cell: ({ row }) => h("div", { class: "w-45" }, row.getValue("timestamp")),
     canSort: true,
   },
   {

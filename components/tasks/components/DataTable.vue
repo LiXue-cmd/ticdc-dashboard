@@ -5,16 +5,23 @@
     <div class="flex items-center justify-between">
       <!-- 过滤字段 -->
       <div class="flex flex-1 items-center space-x-2">
-        <Input v-for="filterColumn in filterColumns" :key="filterColumn.accessorKey"
-          :placeholder="`过滤 ${filterColumn.header}...`" :model-value="(table
+        <Input
+          v-for="filterColumn in filterColumns"
+          :key="filterColumn.accessorKey"
+          :placeholder="`过滤 ${filterColumn.header}...`"
+          :model-value="
+            (table
               .getColumn(filterColumn.accessorKey)
               ?.getFilterValue() as string) ?? ''
-            " class="h-8 w-[150px] lg:w-[250px]" @input="
+          "
+          class="h-8 w-[150px] lg:w-[250px]"
+          @input="
             (e) =>
               table
                 .getColumn(filterColumn.accessorKey)
                 ?.setFilterValue(e.target.value)
-          " />
+          "
+        />
         <!-- 状态筛选下拉菜单（动态渲染） -->
         <template v-if="isStatusFilterEnabled">
           <DropdownMenu class="w-[120px]">
@@ -25,23 +32,35 @@
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
-              <DropdownMenuCheckboxItem value="all" :checked="filterStatus === 'all'" @update:checked="
-                (value) => (filterStatus = value ? 'all' : undefined)
-              ">
+              <DropdownMenuCheckboxItem
+                value="all"
+                :checked="filterStatus === 'all'"
+                @update:checked="
+                  (value) => (filterStatus = value ? 'all' : undefined)
+                "
+              >
                 全部
               </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem v-for="option in props.statusOptions || []" :key="option.value"
-                :value="option.value" :checked="filterStatus === option.value" @update:checked="
+              <DropdownMenuCheckboxItem
+                v-for="option in props.statusOptions || []"
+                :key="option.value"
+                :value="option.value"
+                :checked="filterStatus === option.value"
+                @update:checked="
                   (value) => (filterStatus = value ? option.value : undefined)
-                ">
+                "
+              >
                 {{ option.label }}
               </DropdownMenuCheckboxItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </template>
 
-        <Button v-if="isFiltered || (isStatusFilterEnabled && filterStatus !== 'all')" class="h-8 px-2 lg:px-3"
-          @click="resetFilters">
+        <Button
+          v-if="isFiltered || (isStatusFilterEnabled && filterStatus !== 'all')"
+          class="h-8 px-2 lg:px-3"
+          @click="resetFilters"
+        >
           <!-- variant="ghost" -->
           重置
           <Icon name="i-radix-icons-cross-2" class="ml-2 h-4 w-4" />
@@ -54,18 +73,32 @@
             {{ addTaskText }}
           </Button>
         </NuxtLink>
+        <!-- 新增：额外操作插槽（如备份/还原按钮） -->
+        <slot name="extra-actions" />
         <DropdownMenu>
           <DropdownMenuTrigger as-child>
-            <Button variant="outline" size="sm" class="ml-auto hidden h-8 lg:flex">
-              <Icon name="i-radix-icons-mixer-horizontal" class="mr-2 h-4 w-4" />
+            <Button
+              variant="outline"
+              size="sm"
+              class="ml-auto hidden h-8 lg:flex"
+            >
+              <Icon
+                name="i-radix-icons-mixer-horizontal"
+                class="mr-2 h-4 w-4"
+              />
               视图
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" class="w-[150px]">
             <DropdownMenuLabel>切换列</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuCheckboxItem v-for="column in toggleColumns" :key="column.id" class="capitalize"
-              :checked="column.getIsVisible()" @update:checked="(value) => column.toggleVisibility(!!value)">
+            <DropdownMenuCheckboxItem
+              v-for="column in toggleColumns"
+              :key="column.id"
+              class="capitalize"
+              :checked="column.getIsVisible()"
+              @update:checked="(value) => column.toggleVisibility(!!value)"
+            >
               {{ column.columnDef.header }}
             </DropdownMenuCheckboxItem>
           </DropdownMenuContent>
@@ -76,21 +109,37 @@
     <div class="border rounded-md">
       <Table>
         <TableHeader>
-          <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
+          <TableRow
+            v-for="headerGroup in table.getHeaderGroups()"
+            :key="headerGroup.id"
+          >
             <TableHead v-for="header in headerGroup.headers" :key="header.id">
-              <DataTableColumnHeader v-if="!header.isPlaceholder && header.column.columnDef.header"
-                :column="header.column" :title="header.column.columnDef.header" class="cursor-pointer" />
-              <FlexRender v-else-if="!header.isPlaceholder" :render="header.column.columnDef.header"
-                :props="header.getContext()" />
+              <DataTableColumnHeader
+                v-if="!header.isPlaceholder && header.column.columnDef.header"
+                :column="header.column"
+                :title="header.column.columnDef.header"
+                class="cursor-pointer"
+              />
+              <FlexRender
+                v-else-if="!header.isPlaceholder"
+                :render="header.column.columnDef.header"
+                :props="header.getContext()"
+              />
             </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           <template v-if="table.getRowModel().rows?.length">
-            <TableRow v-for="row in table.getRowModel().rows" :key="row.id"
-              :data-state="row.getIsSelected() && 'selected'">
+            <TableRow
+              v-for="row in table.getRowModel().rows"
+              :key="row.id"
+              :data-state="row.getIsSelected() && 'selected'"
+            >
               <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
-                <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+                <FlexRender
+                  :render="cell.column.columnDef.cell"
+                  :props="cell.getContext()"
+                />
               </TableCell>
             </TableRow>
           </template>

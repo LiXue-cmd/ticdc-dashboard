@@ -4,24 +4,18 @@
     <div class="flex flex-wrap items-center justify-between gap-4">
       <div>
         <h2 class="text-2xl font-bold tracking-tight">数据备份管理</h2>
-        <p class="text-muted-foreground">
-          对系统数据进行备份和还原操作
-        </p>
-      </div>
-      <div class="flex gap-2">
-        <Button variant="outline" @click="backupData"> 备份数据 </Button>
-        <Button variant="outline" @click="restoreData"> 还原数据 </Button>
+        <p class="text-muted-foreground">对系统数据进行备份和还原操作</p>
       </div>
     </div>
 
     <!-- 数据列表 -->
-    <DataTable
-      :columns="columns"
-      :data="filteredData"
-      :filterColumns="filterColumns"
-      :is-loading="isLoading"
-      no-data-text="暂无数据"
-    />
+    <DataTable :columns="columns" :data="filteredData" :filterColumns="filterColumns" :is-loading="isLoading"
+      no-data-text="暂无数据">
+      <template #extra-actions>
+        <Button variant="outline" @click="backupData" size="sm">备份数据</Button>
+        <Button variant="outline" @click="restoreData" size="sm">还原数据</Button>
+      </template>
+    </DataTable>
 
     <!-- 备份确认对话框 -->
     <Dialog :open="isBackupModalOpen" on-close="closeBackupModal">
@@ -50,7 +44,9 @@
 
         <div class="mt-4 flex justify-end gap-2">
           <Button variant="outline" @click="closeRestoreModal"> 取消 </Button>
-          <Button variant="destructive" @click="performRestore"> 确认还原 </Button>
+          <Button variant="destructive" @click="performRestore">
+            确认还原
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -121,10 +117,10 @@ const filterColumns = ref([{ accessorKey: "name", header: "数据名称" }]);
 // 计算属性：过滤后的数据
 const filteredData = computed(() => {
   if (!Array.isArray(data.value)) {
-    console.error('data.value 不是数组:', data.value);
+    console.error("data.value 不是数组:", data.value);
     return [];
   }
-  
+
   return data.value.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
@@ -162,10 +158,17 @@ const columns: ColumnDef<any>[] = [
     header: "状态",
     cell: ({ row }) => {
       const status = row.getValue("status");
-      return h(Badge, {
-        variant: "outline",
-        class: status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800",
-      }, () => status === "active" ? "启用" : "禁用");
+      return h(
+        Badge,
+        {
+          variant: "outline",
+          class:
+            status === "active"
+              ? "bg-green-100 text-green-800"
+              : "bg-red-100 text-red-800",
+        },
+        () => (status === "active" ? "启用" : "禁用")
+      );
     },
     canSort: true,
   },
@@ -177,21 +180,21 @@ onMounted(() => loadData());
 // 数据加载 - 使用模拟数据
 const loadData = async () => {
   isLoading.value = true;
-  
+
   try {
     // 模拟API请求延迟
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
     // 使用模拟数据
     data.value = mockData;
-    
+
     toast({
       title: "数据加载成功",
       description: "已使用模拟数据",
       variant: "default",
     });
   } catch (error) {
-    console.error('获取数据列表失败:', error);
+    console.error("获取数据列表失败:", error);
     // 出错时仍使用模拟数据
     data.value = mockData;
     toast({
@@ -216,8 +219,8 @@ const closeBackupModal = () => {
 const performBackup = async () => {
   try {
     // 模拟API请求延迟
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     // 备份数据
     backupDataStore.value = [...data.value];
     toast({
@@ -255,8 +258,8 @@ const closeRestoreModal = () => {
 const performRestore = async () => {
   try {
     // 模拟API请求延迟
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     // 还原数据
     data.value = [...backupDataStore.value];
     toast({

@@ -58,6 +58,12 @@
       :filterColumns="filterColumns"
       no-data-text="暂无接口调用日志"
       class="mt-4"
+      :statusFilterField="'status'"
+      :statusOptions="[
+        { label: '成功', value: 'success' },
+        { label: '失败', value: 'error' },
+        { label: '超时', value: 'timeout' },
+      ]"
     />
   </div>
 </template>
@@ -154,7 +160,6 @@ const logs = ref<any[]>([
 const filterColumns = ref([
   { accessorKey: "path", header: "请求路径" },
   { accessorKey: "user", header: "用户" },
-  { accessorKey: "status", header: "状态" },
 ]);
 // 过滤配置
 const filteredLogs = computed(() => {
