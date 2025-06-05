@@ -18,7 +18,7 @@
     </DataTable>
 
     <!-- 备份确认对话框 -->
-    <Dialog :open="isBackupModalOpen" on-close="closeBackupModal">
+    <Dialog :open="isBackupModalOpen" @update:open="closeBackupModal">
       <DialogContent class="w-80 -translate-x-1/2! -translate-y-1/2!">
         <DialogTitle class="text-lg font-medium">确认备份</DialogTitle>
         <DialogDescription class="mt-2 text-muted-foreground">
@@ -34,7 +34,7 @@
     </Dialog>
 
     <!-- 还原确认对话框 -->
-    <Dialog :open="isRestoreModalOpen" on-close="closeRestoreModal">
+    <Dialog :open="isRestoreModalOpen" @update:open="closeRestoreModal">
       <DialogContent class="w-80 -translate-x-1/2! -translate-y-1/2!">
         <DialogTitle class="text-lg font-medium">确认还原</DialogTitle>
         <DialogDescription class="mt-2 text-muted-foreground">
@@ -212,8 +212,9 @@ const backupData = () => {
   isBackupModalOpen.value = true;
 };
 
-const closeBackupModal = () => {
-  isBackupModalOpen.value = false;
+const closeBackupModal = (open?: boolean) => {
+  // 如果传入参数，使用参数值；否则设为 false
+  isBackupModalOpen.value = typeof open === 'boolean' ? open : false;
 };
 
 const performBackup = async () => {
@@ -251,8 +252,9 @@ const restoreData = () => {
   isRestoreModalOpen.value = true;
 };
 
-const closeRestoreModal = () => {
-  isRestoreModalOpen.value = false;
+const closeRestoreModal = (open?: boolean) => {
+  // 如果传入参数，使用参数值；否则设为 false
+  isRestoreModalOpen.value = typeof open === 'boolean' ? open : false;
 };
 
 const performRestore = async () => {

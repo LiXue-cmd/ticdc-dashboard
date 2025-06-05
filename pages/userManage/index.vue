@@ -22,7 +22,7 @@
     />
 
     <!-- 删除确认对话框 -->
-    <Dialog :open="isDeleteModalOpen" on-close="closeDeleteModal">
+    <Dialog :open="isDeleteModalOpen" @update:open="closeDeleteModal">
       <DialogContent class="w-80 -translate-x-1/2! -translate-y-1/2!">
         <DialogTitle class="text-lg font-medium">确认删除</DialogTitle>
         <DialogDescription class="mt-2 text-muted-foreground">
@@ -44,7 +44,7 @@
     <!-- 修改密码对话框 -->
     <Dialog
       :open="isChangePasswordModalOpen"
-      on-close="closeChangePasswordModal"
+      @update:open="closeChangePasswordModal"
     >
       <DialogContent class="w-80 -translate-x-1/2! -translate-y-1/2!">
         <DialogTitle class="text-lg font-medium">修改密码</DialogTitle>
@@ -357,8 +357,9 @@ const showDeleteConfirm = (user: any) => {
   isDeleteModalOpen.value = true;
 };
 
-const closeDeleteModal = () => {
-  isDeleteModalOpen.value = false;
+const closeDeleteModal = (open?: boolean) => {
+  // 如果传入参数，使用参数值；否则设为 false
+  isDeleteModalOpen.value = typeof open === 'boolean' ? open : false;
   deletingUser.value = {};
 };
 
