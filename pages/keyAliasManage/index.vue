@@ -15,15 +15,6 @@
     />
      <!-- 删除确认对话框 -->
     <Dialog :open="isDeleteModalOpen" on-close="closeDeleteModal">
-      <DialogTrigger as-child>
-        <!-- 触发按钮会在操作列中动态生成 -->
-        <template #trigger>
-          <button class="transparent">
-            <!-- 这里不需要实际按钮，由操作列的删除按钮触发 -->
-          </button>
-        </template>
-      </DialogTrigger>
-
       <DialogContent class="w-80">
         <DialogTitle class="text-lg font-medium">确认删除</DialogTitle>
         <DialogDescription class="mt-2 text-muted-foreground">
