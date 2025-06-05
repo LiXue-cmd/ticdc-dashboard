@@ -47,7 +47,7 @@
                   @vuejs
                 </Button>
               </HoverCardTrigger>
-              <HoverCardContent class="w-80">
+              <HoverCardContent class="w-80 -translate-x-1/2! -translate-y-1/2!">
                 <div class="flex justify-between space-x-4">
                   <Avatar>
                     <AvatarImage src="https://github.com/vuejs.png" />

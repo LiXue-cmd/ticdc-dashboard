@@ -19,7 +19,7 @@
 
     <!-- 备份确认对话框 -->
     <Dialog :open="isBackupModalOpen" on-close="closeBackupModal">
-      <DialogContent class="w-80">
+      <DialogContent class="w-80 -translate-x-1/2! -translate-y-1/2!">
         <DialogTitle class="text-lg font-medium">确认备份</DialogTitle>
         <DialogDescription class="mt-2 text-muted-foreground">
           确定要备份当前数据吗？<br />
@@ -35,7 +35,7 @@
 
     <!-- 还原确认对话框 -->
     <Dialog :open="isRestoreModalOpen" on-close="closeRestoreModal">
-      <DialogContent class="w-80">
+      <DialogContent class="w-80 -translate-x-1/2! -translate-y-1/2!">
         <DialogTitle class="text-lg font-medium">确认还原</DialogTitle>
         <DialogDescription class="mt-2 text-muted-foreground">
           确定要还原到之前的备份数据吗？<br />

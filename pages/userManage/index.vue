@@ -23,7 +23,7 @@
 
     <!-- 删除确认对话框 -->
     <Dialog :open="isDeleteModalOpen" on-close="closeDeleteModal">
-      <DialogContent class="w-80">
+      <DialogContent class="w-80 -translate-x-1/2! -translate-y-1/2!">
         <DialogTitle class="text-lg font-medium">确认删除</DialogTitle>
         <DialogDescription class="mt-2 text-muted-foreground">
           确定要删除
@@ -46,7 +46,7 @@
       :open="isChangePasswordModalOpen"
       on-close="closeChangePasswordModal"
     >
-      <DialogContent class="w-80">
+      <DialogContent class="w-80 -translate-x-1/2! -translate-y-1/2!">
         <DialogTitle class="text-lg font-medium">修改密码</DialogTitle>
         <DialogDescription class="mt-2 text-muted-foreground">
           为用户

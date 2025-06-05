@@ -41,7 +41,7 @@
 
     <!-- 删除确认对话框 -->
     <Dialog :open="isDeleteModalOpen" on-close="closeDeleteModal">
-      <DialogContent class="w-80">
+      <DialogContent class="w-80 -translate-x-1/2! -translate-y-1/2!">
         <DialogTitle class="text-lg font-medium">确认删除</DialogTitle>
         <DialogDescription class="mt-2 text-muted-foreground">
           确定要删除 <strong class="text-gray-900">{{ deletingTag.name }}</strong> 吗？<br />
