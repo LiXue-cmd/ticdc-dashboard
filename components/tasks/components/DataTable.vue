@@ -58,18 +58,30 @@
 
         <Button
           v-if="isFiltered || (isStatusFilterEnabled && filterStatus !== 'all')"
+          variant="ghost"
           class="h-8 px-2 lg:px-3"
           @click="resetFilters"
         >
-          <!-- variant="ghost" -->
           重置
           <Icon name="i-radix-icons-cross-2" class="ml-2 h-4 w-4" />
         </Button>
       </div>
       <!-- 新增任务按钮和切换列显示菜单 -->
       <div class="flex items-center space-x-2">
-        <NuxtLink :to="addTaskRoute" class="h-8 px-2" v-if="addTaskRoute">
-          <Button variant="outline" size="sm">
+        <!-- 批量删除按钮 -->
+        <Button
+          v-if="selectedRowsCount > 0"
+          variant="destructive"
+          size="sm"
+          class="h-8"
+          @click="handleBatchDelete"
+        >
+          <Icon name="i-radix-icons-trash" class="mr-2 h-4 w-4" />
+          批量删除 ({{ selectedRowsCount }})
+        </Button>
+        
+        <NuxtLink v-if="addTaskRoute" :to="addTaskRoute" class="h-8">
+          <Button variant="outline" size="sm" class="px-2">
             {{ addTaskText }}
           </Button>
         </NuxtLink>
@@ -115,9 +127,9 @@
           >
             <TableHead v-for="header in headerGroup.headers" :key="header.id">
               <DataTableColumnHeader
-                v-if="!header.isPlaceholder && header.column.columnDef.header"
+                v-if="!header.isPlaceholder && header.column.columnDef.header && typeof header.column.columnDef.header === 'string'"
                 :column="header.column"
-                :title="header.column.columnDef.header"
+                :title="String(header.column.columnDef.header)"
                 class="cursor-pointer"
               />
               <FlexRender
@@ -144,8 +156,8 @@
             </TableRow>
           </template>
           <TableRow v-else>
-            <TableCell :colspan="columns.length" class="h-24 text-center">
-              No results.
+            <TableCell :colspan="tableColumns.length" class="h-24 text-center">
+              {{ noDataText || 'No results.' }}
             </TableCell>
           </TableRow>
         </TableBody>
@@ -163,7 +175,7 @@ import type {
   SortingState,
   VisibilityState,
 } from "@tanstack/vue-table";
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, h } from "vue";
 import { valueUpdater } from "@/lib/utils";
 import {
   FlexRender,
@@ -173,6 +185,7 @@ import {
   getSortedRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
+import { Checkbox } from "@/components/ui/checkbox";
 import DataTablePagination from "./DataTablePagination.vue";
 import DataTableColumnHeader from "./DataTableColumnHeader.vue";
 
@@ -182,12 +195,26 @@ interface DataTableProps {
   filterColumns?: ColumnDef<any, any>[];
   addTaskRoute?: string;
   addTaskText?: string;
+  noDataText?: string;
   // 新增：状态筛选相关Props
   statusFilterField?: string; // 状态字段名（如 'status'）
   statusOptions?: { label: string; value: string }[]; // 状态选项列表
 }
 
-const props = defineProps<DataTableProps>();
+const props = withDefaults(defineProps<DataTableProps>(), {
+  filterColumns: () => [],
+  addTaskRoute: '',
+  addTaskText: '新增',
+  noDataText: 'No results.',
+  statusFilterField: '',
+  statusOptions: () => []
+});
+
+// 定义事件
+const emit = defineEmits<{
+  batchDelete: [selectedIds: any[]]
+}>();
+
 // 组件内响应式状态
 const filterStatus = ref<string | undefined>("all"); // 当前筛选状态
 const isStatusFilterEnabled = computed(() => !!props.statusFilterField); // 是否启用状态筛选
@@ -215,12 +242,42 @@ const filteredData = computed(() => {
   return result;
 });
 
+// 构建包含选择框的完整列定义
+const tableColumns = computed(() => {
+  const selectColumn: ColumnDef<any, any> = {
+    id: "select",
+    header: ({ table }) => {
+      return h(Checkbox, {
+        checked: table.getIsAllPageRowsSelected() || 
+                (table.getIsSomePageRowsSelected() ? 'indeterminate' : false),
+        'onUpdate:checked': (value: boolean) => {
+          table.toggleAllPageRowsSelected(!!value);
+        },
+        ariaLabel: "Select all",
+      });
+    },
+    cell: ({ row }) => {
+      return h(Checkbox, {
+        checked: row.getIsSelected(),
+        'onUpdate:checked': (value: boolean) => {
+          row.toggleSelected(!!value);
+        },
+        ariaLabel: "Select row",
+      });
+    },
+    enableSorting: false,
+    enableHiding: false,
+  };
+
+  return [selectColumn, ...props.columns];
+});
+
 const table = useVueTable({
   get data() {
     return filteredData.value;
   },
   get columns() {
-    return props.columns;
+    return tableColumns.value;
   },
   state: {
     get sorting() {
@@ -250,16 +307,36 @@ const table = useVueTable({
   getSortedRowModel: getSortedRowModel(),
 });
 
+// 计算选中行数量
+const selectedRowsCount = computed(() => {
+  return Object.keys(rowSelection.value).length;
+});
+
+// 获取选中的行数据
+const getSelectedRowsData = () => {
+  const selectedRows = table.getFilteredSelectedRowModel().rows;
+  return selectedRows.map(row => row.original);
+};
+
+// 批量删除处理
+const handleBatchDelete = () => {
+  const selectedData = getSelectedRowsData();
+  const selectedIds = selectedData.map(item => item.id);
+  emit('batchDelete', selectedIds);
+};
+
 // 监听筛选状态变更，重置分页到第一页
 watch(filterStatus, () => {
   table.setPageIndex(0);
 });
 
-// 监听数据变化，重置分页
+// 监听数据变化，重置分页和选择状态
 watch(
   () => props.data,
   () => {
     table.setPageIndex(0);
+    // 清空选择状态
+    rowSelection.value = {};
   },
   { deep: true }
 );
@@ -269,6 +346,7 @@ const resetFilters = () => {
   table.resetColumnFilters(); // 清除文本过滤
   filterStatus.value = "all"; // 重置状态筛选
   table.setPageIndex(0); // 重置分页到第一页
+  rowSelection.value = {}; // 清空选择状态
 };
 
 // 状态标签映射函数
@@ -280,20 +358,27 @@ const getStatusLabel = (value: string | undefined) => {
   return option?.label || value;
 };
 
-const filterColumns = computed(() => props.filterColumns || props.columns);
+const filterColumns = computed(() => props.filterColumns?.length ? props.filterColumns : props.columns);
 const isFiltered = computed(() => table.getState().columnFilters.length > 0);
-const addTaskRoute = computed(() => props.addTaskRoute || "");
-const addTaskText = computed(() => props.addTaskText || "");
 
-// 计算可切换的列
+// 计算可切换的列（排除选择框列）
 const toggleColumns = computed(() =>
   table
     .getAllColumns()
     .filter(
       (column) =>
-        typeof column.accessorFn !== "undefined" && column.getCanHide()
+        typeof column.accessorFn !== "undefined" && 
+        column.getCanHide() && 
+        column.id !== "select"
     )
 );
+
+// 暴露清空选择的方法给父组件
+defineExpose({
+  clearSelection: () => {
+    rowSelection.value = {};
+  }
+});
 </script>
 
 <style scoped>

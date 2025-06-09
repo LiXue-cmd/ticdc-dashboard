@@ -12,6 +12,7 @@
 
     <!-- 应用列表 -->
     <DataTable
+      ref="dataTable"
       :columns="columns"
       :data="filteredTags"
       :filterColumns="filterColumns"
@@ -19,6 +20,9 @@
       no-data-text="暂无应用数据"
       addTaskRoute="/appmanage/create"
       addTaskText="新增应用"
+      :statusFilterField="'status'"
+      :statusOptions="statusOptions"
+      @batch-delete="handleBatchDelete"
     />
 
     <!-- 删除确认对话框 -->
@@ -35,6 +39,27 @@
         <div class="mt-4 flex justify-end gap-2">
           <Button variant="outline" @click="closeDeleteModal"> 取消 </Button>
           <Button variant="destructive" @click="handleDeleteTag"> 删除 </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    <!-- 批量删除确认对话框 -->
+    <Dialog :open="isBatchDeleteModalOpen" @update:open="closeBatchDeleteModal">
+      <DialogContent class="w-96 -translate-x-1/2! -translate-y-1/2!">
+        <DialogTitle class="text-lg font-medium">确认批量删除</DialogTitle>
+        <DialogDescription class="mt-2 text-muted-foreground">
+          确定要删除选中的 <strong class="text-gray-900">{{ batchDeleteIds.length }}</strong> 个应用吗？<br />
+          <span class="text-sm text-gray-600 mt-2 block">
+            包括：{{ getBatchDeleteNames() }}
+          </span><br />
+          此操作不可撤销，且会影响关联的所有资源。
+        </DialogDescription>
+
+        <div class="mt-4 flex justify-end gap-2">
+          <Button variant="outline" @click="closeBatchDeleteModal"> 取消 </Button>
+          <Button variant="destructive" @click="confirmBatchDelete"> 
+            删除 {{ batchDeleteIds.length }} 个应用
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -66,6 +91,13 @@ import DataTable from "@/components/tasks/components/DataTable.vue";
 import type { ColumnDef } from "@tanstack/vue-table";
 import DataTableRowActions from "@/components/tasks/components/DataTableRowActions.vue";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogTitle 
+} from "@/components/ui/dialog";
 import { h } from "vue";
 import { useFetch } from "#app";
 import { useRouter } from "vue-router";
@@ -75,6 +107,8 @@ const router = useRouter();
 const { toast } = useToast();
 const isLoading = ref(false);
 const searchQuery = ref("");
+const dataTable = ref<InstanceType<typeof DataTable> | null>(null); // 修复类型
+
 const appmanage = ref<any[]>([
   {
     id: 1,
@@ -98,7 +132,7 @@ const appmanage = ref<any[]>([
     description: "控制权限范围",
     createDate: "2023-03-10",
     updateDate: "2023-03-12",
-    status: "active",
+    status: "inactive",
   },
 ]);
 
@@ -106,9 +140,19 @@ const appmanage = ref<any[]>([
 const isDeleteModalOpen = ref(false);
 const deletingTag = ref<any>({});
 
+// 批量删除相关状态
+const isBatchDeleteModalOpen = ref(false);
+const batchDeleteIds = ref<any[]>([]);
+
 // 重置AppSecret相关状态
 const isResetModalOpen = ref(false);
 const resettingApp = ref<any>({});
+
+// 状态选项配置
+const statusOptions = ref([
+  { label: "启用", value: "active" },
+  { label: "禁用", value: "inactive" }
+]);
 
 const filterColumns = ref([{ accessorKey: "name", header: "应用名称" }]);
 
@@ -125,37 +169,46 @@ const columns: ColumnDef<any>[] = [
     accessorKey: "id",
     header: "APPID",
     cell: ({ row }) => row.getValue("id") || "-",
-    canSort: true,
-    canHide: true,
+    meta: {
+      canSort: true,
+      canHide: true,
+    },
   },
   {
     accessorKey: "name",
     header: "应用名称",
     cell: ({ row }) => row.getValue("name") || "-",
-    canSort: true,
+    meta: {
+      canSort: true,
+    },
   },
   {
     accessorKey: "description",
     header: "描述",
     cell: ({ row }) => row.getValue("description") || "-",
-    canSort: true,
-    cellProps: { class: "max-w-[200px] overflow-ellipsis" }, // 限制描述宽度
+    meta: {
+      canSort: true,
+      cellProps: { class: "max-w-[200px] overflow-ellipsis" },
+    },
   },
   {
     accessorKey: "createDate",
     header: "创建日期",
     cell: ({ row }) => row.getValue("createDate") || "-",
-    canSort: true,
-    cellProps: { class: "w-28" },
+    meta: {
+      canSort: true,
+      cellProps: { class: "w-28" },
+    },
   },
   {
     accessorKey: "updateDate",
     header: "更新日期",
     cell: ({ row }) => row.getValue("updateDate") || "-",
-    canSort: true,
-    cellProps: { class: "w-28" },
+    meta: {
+      canSort: true,
+      cellProps: { class: "w-28" },
+    },
   },
-
   {
     accessorKey: "status",
     header: "状态",
@@ -173,8 +226,10 @@ const columns: ColumnDef<any>[] = [
         () => (status === "active" ? "启用" : "禁用")
       );
     },
-    canSort: true, // 支持按状态排序
-    canHide: true,
+    meta: {
+      canSort: true,
+      canHide: true,
+    },
   },
   {
     id: "actions",
@@ -185,7 +240,7 @@ const columns: ColumnDef<any>[] = [
           type: "action",
           label: "编辑",
           icon: "i-radix-icons-edit",
-          onClick: (tag) => editTag(tag.id),
+          onClick: (tag: any) => editTag(tag.id),
           variant: "outline",
         },
         // 根据当前状态显示启用或禁用按钮
@@ -194,30 +249,30 @@ const columns: ColumnDef<any>[] = [
               type: "action",
               label: "禁用",
               icon: "i-radix-icons-toggle-off",
-              onClick: (task) => updateStatus(task, "inactive"),
-              class: "text-red-600 hover:bg-red-50", // 添加红色样式
+              onClick: (task: any) => updateStatus(task, "inactive"),
+              class: "text-red-600 hover:bg-red-50",
             }
           : {
               type: "action",
               label: "启用",
               icon: "i-radix-icons-toggle-on",
-              onClick: (task) => updateStatus(task, "active"),
-              class: "text-green-600 hover:bg-green-50", // 添加绿色样式
+              onClick: (task: any) => updateStatus(task, "active"),
+              class: "text-green-600 hover:bg-green-50",
             },
         {
           type: "action",
           label: "重置AppSecret",
           icon: "i-radix-icons-key",
-          onClick: (tag) => showResetConfirm(tag), // 新增重置点击事件
+          onClick: (tag: any) => showResetConfirm(tag),
           variant: "outline",
         },
-        // {
-        //   type: "action",
-        //   label: "删除",
-        //   icon: "i-radix-icons-trash",
-        //   onClick: (tag) => showDeleteConfirm(tag),
-        //   variant: "destructive",
-        // },
+        {
+          type: "action",
+          label: "删除",
+          icon: "i-radix-icons-trash",
+          onClick: (tag: any) => showDeleteConfirm(tag),
+          variant: "destructive",
+        },
       ];
 
       return h(DataTableRowActions, {
@@ -226,7 +281,9 @@ const columns: ColumnDef<any>[] = [
         iconName: "i-radix-icons-dots-horizontal",
       });
     },
-    canHide: true,
+    meta: {
+      canHide: true,
+    },
   },
 ];
 
@@ -239,10 +296,14 @@ onMounted(() => {
 async function loadTags() {
   isLoading.value = true;
   try {
-    const { data } = await useFetch("/api/appmanage");
-    if (data.value) {
-      appmanage.value = data.value;
-    }
+    // 注释掉API调用，使用模拟数据
+    // const { data } = await useFetch("/api/appmanage");
+    // if (data.value) {
+    //   appmanage.value = data.value;
+    // }
+    
+    // 模拟延迟
+    await new Promise(resolve => setTimeout(resolve, 500));
   } catch (error) {
     toast({
       title: "加载失败",
@@ -264,8 +325,8 @@ const showDeleteConfirm = (tag: any) => {
   deletingTag.value = tag;
   isDeleteModalOpen.value = true;
 };
+
 const closeDeleteModal = (open?: boolean) => {
-  // 如果传入参数，使用参数值；否则设为 false
   isDeleteModalOpen.value = typeof open === 'boolean' ? open : false;
   deletingTag.value = {};
 };
@@ -275,29 +336,86 @@ const handleDeleteTag = async () => {
   if (!id) return;
 
   try {
-    const { error } = await useFetch(`/api/appmanage/${id}`, {
-      method: "DELETE",
-    });
+    // 注释掉API调用，使用模拟删除
+    // const { error } = await useFetch(`/api/appmanage/${id}`, {
+    //   method: "DELETE",
+    // });
 
-    if (error?.value) {
-      toast({
-        title: "删除失败",
-        description: error.value.statusMessage,
-        variant: "destructive",
-      });
-    } else {
-      appmanage.value = appmanage.value.filter((tag) => tag.id !== id);
-      toast({
-        description: "应用已成功删除！",
-        variant: "default",
-      });
-      closeDeleteModal();
-    }
+    // 模拟删除成功
+    appmanage.value = appmanage.value.filter((tag) => tag.id !== id);
+    toast({
+      description: "应用已成功删除！",
+      variant: "default",
+    });
+    closeDeleteModal();
   } catch (error) {
     console.error("删除失败:", error);
     toast({
       title: "系统错误",
       description: "处理删除请求时发生未知错误",
+      variant: "destructive",
+    });
+  }
+};
+
+// 批量删除流程
+const handleBatchDelete = (selectedIds: any[]) => {
+  if (selectedIds.length === 0) {
+    toast({
+      title: "提示",
+      description: "请选择要删除的应用",
+      variant: "default",
+    });
+    return;
+  }
+  batchDeleteIds.value = selectedIds;
+  isBatchDeleteModalOpen.value = true;
+};
+
+const closeBatchDeleteModal = () => {
+  isBatchDeleteModalOpen.value = false;
+  batchDeleteIds.value = [];
+};
+
+const getBatchDeleteNames = () => {
+  const names = batchDeleteIds.value
+    .map(id => {
+      const app = appmanage.value.find(item => item.id === id);
+      return app?.name;
+    })
+    .filter(name => name)
+    .slice(0, 3);
+  
+  const result = names.join('、');
+  if (batchDeleteIds.value.length > 3) {
+    return result + ' 等';
+  }
+  return result;
+};
+
+const confirmBatchDelete = async () => {
+  try {
+    // 模拟批量删除成功
+    appmanage.value = appmanage.value.filter(
+      (app) => !batchDeleteIds.value.includes(app.id)
+    );
+
+    toast({
+      description: `成功删除 ${batchDeleteIds.value.length} 个应用！`,
+      variant: "default",
+    });
+
+    // 清空选择状态
+    if (dataTable.value) {
+      dataTable.value.clearSelection();
+    }
+
+    closeBatchDeleteModal();
+  } catch (error) {
+    console.error("批量删除失败:", error);
+    toast({
+      title: "删除失败",
+      description: "批量删除时发生错误",
       variant: "destructive",
     });
   }
@@ -318,7 +436,7 @@ const handleResetAppSecret = () => {
   const { id } = resettingApp.value;
   if (!id) return;
 
-  // 模拟重置逻辑（实际需调用API）
+  // 模拟重置逻辑
   appmanage.value = appmanage.value.map((app) =>
     app.id === id ? { ...app, appSecret: generateNewSecret() } : app
   );
@@ -331,37 +449,39 @@ const handleResetAppSecret = () => {
   closeResetModal();
 };
 
-// 模拟生成新密钥（实际需替换为安全的密钥生成逻辑）
+// 模拟生成新密钥
 const generateNewSecret = () => {
   return `APPSECRET-${Math.random().toString(36).substr(2, 16)}`;
 };
 
 const updateStatus = (task: any, targetStatus: string) => {
   const index = appmanage.value.findIndex(
-    (item) => item.invoice === task.invoice
+    (item) => item.id === task.id
   );
   if (index === -1) {
-    console.error("未找到对应的密钥记录");
+    console.error("未找到对应的应用记录");
     return;
   }
 
-  // 创建新对象并更新状态
   const newTask = {
     ...task,
     status: targetStatus,
   };
 
-  // 更新 appmanage 数组，触发响应式更新
   appmanage.value = [
     ...appmanage.value.slice(0, index),
     newTask,
     ...appmanage.value.slice(index + 1),
   ];
+
+  toast({
+    description: `应用状态已更新为${targetStatus === 'active' ? '启用' : '禁用'}！`,
+    variant: "default",
+  });
 };
 </script>
 
 <style scoped>
-/* 表格列样式 */
 .max-w-[200px] {
   max-width: 200px;
 }
