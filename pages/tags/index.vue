@@ -83,7 +83,7 @@ const tags = ref<any[]>([
 // 删除相关状态
 const isDeleteModalOpen = ref(false);
 const deletingTag = ref<any>({});
-const filterColumns = ref([{ id: "name", header: "标签名称" }]);
+const filterColumns = ref([{ accessorKey: "name", header: "标签名称" }]);
 
 // 计算属性：过滤后的数据
 const filteredTags = computed(() => {

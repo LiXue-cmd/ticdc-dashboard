@@ -112,7 +112,7 @@ const backupDataStore = ref<any[]>([]);
 const isBackupModalOpen = ref(false);
 const isRestoreModalOpen = ref(false);
 
-const filterColumns = ref([{ id: "name", header: "数据名称" }]);
+const filterColumns = ref([{ accessorKey: "name", header: "数据名称" }]);
 
 // 计算属性：过滤后的数据
 const filteredData = computed(() => {

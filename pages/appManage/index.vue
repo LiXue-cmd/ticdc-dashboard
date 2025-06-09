@@ -154,7 +154,7 @@ const statusOptions = ref([
   { label: "禁用", value: "inactive" }
 ]);
 
-const filterColumns = ref([{ id: "name", header: "应用名称" }]);
+const filterColumns = ref([{ accessorKey: "name", header: "应用名称" }]);
 
 // 计算属性：过滤后的数据
 const filteredTags = computed(() => {

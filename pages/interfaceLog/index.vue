@@ -158,8 +158,8 @@ const logs = ref<any[]>([
 
 // 过滤配置
 const filterColumns = ref([
-  { id: "path", header: "请求路径" },
-  { id: "user", header: "用户" },
+  { accessorKey: "path", header: "请求路径" },
+  { accessorKey: "user", header: "用户" },
 ]);
 // 过滤配置
 const filteredLogs = computed(() => {

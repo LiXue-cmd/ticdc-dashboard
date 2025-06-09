@@ -182,7 +182,7 @@ const changingPasswordUser = ref<any>({});
 const newPassword = ref("");
 const confirmPassword = ref("");
 
-const filterColumns = ref([{ id: "name", header: "用户名" }]);
+const filterColumns = ref([{ accessorKey: "name", header: "用户名" }]);
 
 // 计算属性：过滤后的数据
 const filteredUsers = computed(() => {
