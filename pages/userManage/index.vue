@@ -182,7 +182,7 @@ const changingPasswordUser = ref<any>({});
 const newPassword = ref("");
 const confirmPassword = ref("");
 
-const filterColumns = ref([{ accessorKey: "name", header: "用户名称" }]);
+const filterColumns = ref([{ id: "name", header: "用户名" }]);
 
 // 计算属性：过滤后的数据
 const filteredUsers = computed(() => {
@@ -202,44 +202,37 @@ const columns: ColumnDef<any>[] = [
     accessorKey: "id",
     header: "ID",
     cell: ({ row }) => row.getValue("id") || "-",
-    canSort: true,
-    canHide: true,
   },
   {
     accessorKey: "name",
     header: "名称",
     cell: ({ row }) => row.getValue("name") || "-",
-    canSort: true,
   },
   {
     accessorKey: "description",
     header: "简介",
-    cell: ({ row }) => row.getValue("description") || "-",
-    cellProps: { class: "max-w-[200px] overflow-ellipsis" },
+    cell: ({ row }) =>
+      h("div", { class: "max-w-[200px] overflow-ellipsis" }, row.getValue("description") || "-"),
   },
   {
     accessorKey: "leader",
     header: "负责人",
     cell: ({ row }) => row.getValue("leader") || "-",
-    canSort: true,
   },
   {
     accessorKey: "phone",
     header: "电话",
     cell: ({ row }) => row.getValue("phone") || "-",
-    canSort: true,
   },
   {
     accessorKey: "createDate",
     header: "创建日期",
-    cell: ({ row }) => row.getValue("createDate") || "-",
-    cellProps: { class: "w-28" },
+    cell: ({ row }) => h("div", { class: "w-28" }, row.getValue("createDate") || "-"),
   },
   {
     accessorKey: "updateDate",
     header: "更新日期",
-    cell: ({ row }) => row.getValue("updateDate") || "-",
-    cellProps: { class: "w-28" },
+    cell: ({ row }) => h("div", { class: "w-28" }, row.getValue("updateDate") || "-"),
   },
   {
     accessorKey: "status",
@@ -258,7 +251,6 @@ const columns: ColumnDef<any>[] = [
         () => (status === "active" ? "启用" : "禁用")
       );
     },
-    canSort: true,
   },
   {
     id: "actions",
@@ -266,40 +258,40 @@ const columns: ColumnDef<any>[] = [
     cell: ({ row }) => {
       const actions = [
         {
-          type: "action",
+          type: "action" as const,
           label: "编辑",
           icon: "i-radix-icons-edit",
-          onClick: (user) => editUser(user.id),
+          onClick: (user: any) => editUser(user.id),
           variant: "outline",
         },
         // 根据当前状态显示启用或禁用按钮
         row.getValue("status") === "active"
           ? {
-              type: "action",
+              type: "action" as const,
               label: "禁用",
               icon: "i-radix-icons-toggle-off",
-              onClick: (task) => updateStatus(task, "inactive"),
+              onClick: (task: any) => updateStatus(task, "inactive"),
               class: "text-red-600 hover:bg-red-50", // 添加红色样式
             }
           : {
-              type: "action",
+              type: "action" as const,
               label: "启用",
               icon: "i-radix-icons-toggle-on",
-              onClick: (task) => updateStatus(task, "active"),
+              onClick: (task: any) => updateStatus(task, "active"),
               class: "text-green-600 hover:bg-green-50", // 添加绿色样式
             },
         {
-          type: "action",
+          type: "action" as const,
           label: "修改密码",
           icon: "i-radix-icons-key",
-          onClick: (user) => showChangePassword(user),
+          onClick: (user: any) => showChangePassword(user),
           variant: "outline",
         },
         {
-          type: "action",
+          type: "action" as const,
           label: "删除",
           icon: "i-radix-icons-trash",
-          onClick: (user) => showDeleteConfirm(user),
+          onClick: (user: any) => showDeleteConfirm(user),
           variant: "destructive",
         },
       ];
@@ -309,7 +301,6 @@ const columns: ColumnDef<any>[] = [
         iconName: "i-radix-icons-dots-horizontal",
       });
     },
-    canHide: true,
   },
 ];
 
@@ -339,7 +330,7 @@ const loadUsers = async () => {
     toast({
       title: "加载失败",
       description: "使用模拟数据替代",
-      variant: "warning",
+      variant: "default",
     });
   } finally {
     isLoading.value = false;
@@ -478,10 +469,6 @@ const updateStatus = (user: any, status: string) => {
 
 <style scoped>
 /* 表格列样式 */
-.max-w-[200px] {
-  max-width: 200px;
-}
-
 .overflow-ellipsis {
   overflow: hidden;
   text-overflow: ellipsis;

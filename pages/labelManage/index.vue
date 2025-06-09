@@ -177,6 +177,9 @@ const columns: ColumnDef<any>[] = [
   },
 ];
 
+// 筛选列定义
+const filterColumns = ref([{ id: "name", header: "标签名称" }]);
+
 // 生命周期钩子
 onMounted(() => {
   loadTags();

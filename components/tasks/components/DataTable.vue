@@ -7,20 +7,11 @@
       <div class="flex flex-1 items-center space-x-2">
         <Input
           v-for="filterColumn in filterColumns"
-          :key="filterColumn.accessorKey"
-          :placeholder="`过滤 ${filterColumn.header}...`"
-          :model-value="
-            (table
-              .getColumn(filterColumn.accessorKey)
-              ?.getFilterValue() as string) ?? ''
-          "
+          :key="filterColumn.accessorKey || (typeof filterColumn.header === 'string' ? filterColumn.header : undefined)"
+          :placeholder="`过滤 ${typeof filterColumn.header === 'string' ? filterColumn.header : ''}...`"
+          :model-value="(table.getColumn(filterColumn.accessorKey || (typeof filterColumn.header === 'string' ? filterColumn.header : ''))?.getFilterValue() as string) ?? ''"
           class="h-8 w-[150px] lg:w-[250px]"
-          @input="
-            (e) =>
-              table
-                .getColumn(filterColumn.accessorKey)
-                ?.setFilterValue(e.target.value)
-          "
+          @input="(e: Event) => table.getColumn(filterColumn.accessorKey || (typeof filterColumn.header === 'string' ? filterColumn.header : ''))?.setFilterValue((e.target as HTMLInputElement).value)"
         />
         <!-- 状态筛选下拉菜单（动态渲染） -->
         <template v-if="isStatusFilterEnabled">
@@ -58,7 +49,6 @@
 
         <Button
           v-if="isFiltered || (isStatusFilterEnabled && filterStatus !== 'all')"
-          variant="ghost"
           class="h-8 px-2 lg:px-3"
           @click="resetFilters"
         >

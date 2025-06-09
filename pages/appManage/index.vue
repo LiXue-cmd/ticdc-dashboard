@@ -154,7 +154,7 @@ const statusOptions = ref([
   { label: "禁用", value: "inactive" }
 ]);
 
-const filterColumns = ref([{ accessorKey: "name", header: "应用名称" }]);
+const filterColumns = ref([{ id: "name", header: "应用名称" }]);
 
 // 计算属性：过滤后的数据
 const filteredTags = computed(() => {
@@ -169,45 +169,26 @@ const columns: ColumnDef<any>[] = [
     accessorKey: "id",
     header: "APPID",
     cell: ({ row }) => row.getValue("id") || "-",
-    meta: {
-      canSort: true,
-      canHide: true,
-    },
   },
   {
     accessorKey: "name",
     header: "应用名称",
     cell: ({ row }) => row.getValue("name") || "-",
-    meta: {
-      canSort: true,
-    },
   },
   {
     accessorKey: "description",
     header: "描述",
-    cell: ({ row }) => row.getValue("description") || "-",
-    meta: {
-      canSort: true,
-      cellProps: { class: "max-w-[200px] overflow-ellipsis" },
-    },
+    cell: ({ row }) => h('div', { class: 'max-w-[200px] overflow-ellipsis' }, row.getValue("description") || "-"),
   },
   {
     accessorKey: "createDate",
     header: "创建日期",
-    cell: ({ row }) => row.getValue("createDate") || "-",
-    meta: {
-      canSort: true,
-      cellProps: { class: "w-28" },
-    },
+    cell: ({ row }) => h('div', { class: 'w-28' }, row.getValue("createDate") || "-"),
   },
   {
     accessorKey: "updateDate",
     header: "更新日期",
-    cell: ({ row }) => row.getValue("updateDate") || "-",
-    meta: {
-      canSort: true,
-      cellProps: { class: "w-28" },
-    },
+    cell: ({ row }) => h('div', { class: 'w-28' }, row.getValue("updateDate") || "-"),
   },
   {
     accessorKey: "status",
@@ -226,10 +207,6 @@ const columns: ColumnDef<any>[] = [
         () => (status === "active" ? "启用" : "禁用")
       );
     },
-    meta: {
-      canSort: true,
-      canHide: true,
-    },
   },
   {
     id: "actions",
@@ -237,44 +214,42 @@ const columns: ColumnDef<any>[] = [
     cell: ({ row }) => {
       const actions = [
         {
-          type: "action",
+          type: "action" as const,
           label: "编辑",
           icon: "i-radix-icons-edit",
           onClick: (tag: any) => editTag(tag.id),
           variant: "outline",
         },
-        // 根据当前状态显示启用或禁用按钮
         row.getValue("status") === "active"
           ? {
-              type: "action",
+              type: "action" as const,
               label: "禁用",
               icon: "i-radix-icons-toggle-off",
               onClick: (task: any) => updateStatus(task, "inactive"),
               class: "text-red-600 hover:bg-red-50",
             }
           : {
-              type: "action",
+              type: "action" as const,
               label: "启用",
               icon: "i-radix-icons-toggle-on",
               onClick: (task: any) => updateStatus(task, "active"),
               class: "text-green-600 hover:bg-green-50",
             },
         {
-          type: "action",
+          type: "action" as const,
           label: "重置AppSecret",
           icon: "i-radix-icons-key",
           onClick: (tag: any) => showResetConfirm(tag),
           variant: "outline",
         },
         {
-          type: "action",
+          type: "action" as const,
           label: "删除",
           icon: "i-radix-icons-trash",
           onClick: (tag: any) => showDeleteConfirm(tag),
           variant: "destructive",
         },
       ];
-
       return h(DataTableRowActions, {
         row,
         actions,
@@ -482,13 +457,5 @@ const updateStatus = (task: any, targetStatus: string) => {
 </script>
 
 <style scoped>
-.max-w-[200px] {
-  max-width: 200px;
-}
-
-.overflow-ellipsis {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+/* 表格列样式 */
 </style>

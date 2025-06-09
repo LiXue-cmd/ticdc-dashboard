@@ -158,8 +158,8 @@ const logs = ref<any[]>([
 
 // 过滤配置
 const filterColumns = ref([
-  { accessorKey: "path", header: "请求路径" },
-  { accessorKey: "user", header: "用户" },
+  { id: "path", header: "请求路径" },
+  { id: "user", header: "用户" },
 ]);
 // 过滤配置
 const filteredLogs = computed(() => {
@@ -199,25 +199,22 @@ const columns: ColumnDef<any>[] = [
     accessorKey: "timestamp",
     header: "请求时间",
     cell: ({ row }) => h("div", { class: "w-36" }, row.getValue("timestamp")),
-    canSort: true,
   },
   {
     accessorKey: "requestId",
     header: "请求ID",
     cell: ({ row }) => h("div", { class: "w-40" }, row.getValue("requestId")),
-    canSort: true,
   },
   {
     accessorKey: "path",
     header: "接口路径",
     cell: ({ row }) => h("div", { class: "max-w-[200px] overflow-ellipsis" }, row.getValue("path")),
-    canSort: true,
   },
   {
     accessorKey: "method",
     header: "请求方法",
     cell: ({ row }) => {
-      const method = row.getValue("method");
+      const method = String(row.getValue("method"));
       return h(
         "span",
         {
@@ -226,13 +223,12 @@ const columns: ColumnDef<any>[] = [
         method
       );
     },
-    canSort: true,
   },
   {
     accessorKey: "status",
     header: "状态",
     cell: ({ row }) => {
-      const status = row.getValue("status");
+      const status = String(row.getValue("status"));
       return h(
         "span",
         {
@@ -241,42 +237,26 @@ const columns: ColumnDef<any>[] = [
         getStatusText(status)
       );
     },
-    canSort: true,
   },
   {
     accessorKey: "responseTime",
     header: "响应时间(ms)",
     cell: ({ row }) => row.getValue("responseTime") || "-",
-    canSort: true,
   },
   {
     accessorKey: "clientIp",
     header: "客户端IP",
     cell: ({ row }) => row.getValue("clientIp") || "-",
-    canSort: true,
-    canHide: true,
   },
   {
     accessorKey: "user",
     header: "用户",
     cell: ({ row }) => row.getValue("user") || "-",
-    canSort: true,
-    canHide: true,
   },
   {
     accessorKey: "errorMessage",
     header: "错误信息",
-    cell: ({ row }) => {
-      const message = row.getValue("errorMessage");
-      return h(
-        "div",
-        { 
-          class: `max-w-[300px] overflow-ellipsis ${message ? "text-red-500" : ""}` 
-        },
-        message || "-"
-      );
-    },
-    canHide: true,
+    cell: ({ row }) => h("div", { class: "max-w-[300px] overflow-ellipsis" }, row.getValue("errorMessage") || "-"),
   },
 ];
 
@@ -330,11 +310,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.max-w-[200px] { max-width: 200px; }
-.max-w-[300px] { max-width: 300px; }
-.overflow-ellipsis { 
-  overflow: hidden; 
-  text-overflow: ellipsis; 
-  white-space: nowrap; 
-}
+/* 表格列样式已由 Tailwind 类替代，无需自定义样式 */
 </style>

@@ -83,9 +83,7 @@ const tags = ref<any[]>([
 // 删除相关状态
 const isDeleteModalOpen = ref(false);
 const deletingTag = ref<any>({});
-const filterColumns = ref([
-  { accessorKey: "name", header: "标签名称" },
-]);
+const filterColumns = ref([{ id: "name", header: "标签名称" }]);
 
 // 计算属性：过滤后的数据
 const filteredTags = computed(() => {
@@ -100,35 +98,26 @@ const columns: ColumnDef<any>[] = [
     accessorKey: "id",
     header: "ID",
     cell: ({ row }) => h("div", { class: "w-16 text-right" }, row.getValue("id")),
-    canSort: true,
-    canHide: true,
   },
   {
     accessorKey: "name",
     header: "标签名称",
     cell: ({ row }) => row.getValue("name") || "-",
-    canSort: true,
   },
   {
     accessorKey: "description",
     header: "描述",
-    cell: ({ row }) => row.getValue("description") || "-",
-    canSort: true,
-    cellProps: { class: "max-w-[200px] overflow-ellipsis" }, // 限制描述宽度
+    cell: ({ row }) => h("div", { class: "max-w-[200px] overflow-ellipsis" }, row.getValue("description") || "-"),
   },
   {
     accessorKey: "createDate",
     header: "创建日期",
     cell: ({ row }) => row.getValue("createDate") || "-",
-    canSort: true,
-    cellProps: { class: "w-28" },
   },
   {
     accessorKey: "updateDate",
     header: "更新日期",
     cell: ({ row }) => row.getValue("updateDate") || "-",
-    canSort: true,
-    cellProps: { class: "w-28" },
   },
   {
     id: "actions",
@@ -136,28 +125,22 @@ const columns: ColumnDef<any>[] = [
     cell: ({ row }) => {
       const actions = [
         {
-          type: "action",
+          type: "action" as const,
           label: "编辑",
           icon: "i-radix-icons-edit",
-          onClick: (tag) => editTag(tag.id),
+          onClick: (tag: any) => editTag(tag.id),
           variant: "outline",
         },
         {
-          type: "action",
+          type: "action" as const,
           label: "删除",
           icon: "i-radix-icons-trash",
-          onClick: (tag) => showDeleteConfirm(tag),
+          onClick: (tag: any) => showDeleteConfirm(tag),
           variant: "destructive",
         },
       ];
-
-      return h(DataTableRowActions, {
-        row,
-        actions,
-        iconName: "i-radix-icons-dots-horizontal",
-      });
+      return h(DataTableRowActions, { row, actions, iconName: "i-radix-icons-dots-horizontal" });
     },
-    canHide: true,
   },
 ];
 
@@ -171,8 +154,10 @@ async function loadTags() {
   isLoading.value = true;
   try {
     const { data } = await useFetch("/api/tags");
-    if (data.value) {
+    if (Array.isArray(data.value)) {
       tags.value = data.value;
+    } else {
+      tags.value = [];
     }
   } catch (error) {
     toast({
@@ -238,14 +223,5 @@ const handleDeleteTag = async () => {
 </script>
 
 <style scoped>
-/* 表格列样式 */
-.max-w-[200px] {
-  max-width: 200px;
-}
-
-.overflow-ellipsis {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+/* 表格列样式已由 Tailwind 类替代，无需自定义样式 */
 </style>

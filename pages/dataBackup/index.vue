@@ -112,7 +112,7 @@ const backupDataStore = ref<any[]>([]);
 const isBackupModalOpen = ref(false);
 const isRestoreModalOpen = ref(false);
 
-const filterColumns = ref([{ accessorKey: "name", header: "数据名称" }]);
+const filterColumns = ref([{ id: "name", header: "数据名称" }]);
 
 // 计算属性：过滤后的数据
 const filteredData = computed(() => {
@@ -132,26 +132,21 @@ const columns: ColumnDef<any>[] = [
     accessorKey: "id",
     header: "ID",
     cell: ({ row }) => row.getValue("id") || "-",
-    canSort: true,
-    canHide: true,
   },
   {
     accessorKey: "name",
     header: "名称",
     cell: ({ row }) => row.getValue("name") || "-",
-    canSort: true,
   },
   {
     accessorKey: "type",
     header: "类型",
     cell: ({ row }) => row.getValue("type") || "-",
-    canSort: true,
   },
   {
     accessorKey: "createDate",
     header: "创建日期",
-    cell: ({ row }) => row.getValue("createDate") || "-",
-    cellProps: { class: "w-28" },
+    cell: ({ row }) => h('div', { class: 'w-28' }, row.getValue("createDate") || "-"),
   },
   {
     accessorKey: "status",
@@ -170,7 +165,6 @@ const columns: ColumnDef<any>[] = [
         () => (status === "active" ? "启用" : "禁用")
       );
     },
-    canSort: true,
   },
 ];
 
@@ -200,7 +194,7 @@ const loadData = async () => {
     toast({
       title: "加载失败",
       description: "使用模拟数据替代",
-      variant: "warning",
+      variant: "default",
     });
   } finally {
     isLoading.value = false;
@@ -246,7 +240,7 @@ const restoreData = () => {
     return toast({
       title: "无备份数据",
       description: "请先进行数据备份",
-      variant: "warning",
+      variant: "default",
     });
   }
   isRestoreModalOpen.value = true;
