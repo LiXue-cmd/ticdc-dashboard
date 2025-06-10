@@ -302,17 +302,58 @@ const selectedRowsCount = computed(() => {
   return Object.keys(rowSelection.value).length;
 });
 
-// 获取选中的行数据
+// 获取选中的行数据 - 修复版本
 const getSelectedRowsData = () => {
   const selectedRows = table.getFilteredSelectedRowModel().rows;
   return selectedRows.map(row => row.original);
 };
 
-// 批量删除处理
+// 批量删除处理 - 增强版本
 const handleBatchDelete = () => {
-  const selectedData = getSelectedRowsData();
-  const selectedIds = selectedData.map(item => item.id);
-  emit('batchDelete', selectedIds);
+  console.log('=== 批量删除调试信息 ===');
+  console.log('1. 批量删除按钮被点击');
+  console.log('2. 当前选中行数量:', selectedRowsCount.value);
+  console.log('3. rowSelection 对象:', JSON.stringify(rowSelection.value, null, 2));
+  console.log('4. 表格当前数据:', props.data);
+  
+  try {
+    // 检查是否有选中的行
+    if (selectedRowsCount.value === 0) {
+      console.warn('没有选中任何行');
+      alert('请先选择要删除的行');
+      return;
+    }
+    
+    const selectedRows = table.getFilteredSelectedRowModel().rows;
+    console.log('5. 选中的表格行对象:', selectedRows);
+    
+    const selectedData = selectedRows.map(row => row.original);
+    console.log('6. 选中的原始数据:', selectedData);
+    
+    // 尝试多种 ID 字段名
+    const selectedIds = selectedData.map(item => {
+      const id = item.id || item._id || item.uuid || item.key || item.ID;
+      console.log(`处理项目: ${JSON.stringify(item)}, 提取的ID: ${id}`);
+      return id;
+    }).filter(id => id !== undefined && id !== null);
+    
+    console.log('7. 最终提取的 ID 列表:', selectedIds);
+    
+    if (selectedIds.length === 0) {
+      console.error('无法提取有效的 ID，请检查数据结构');
+      console.log('数据示例:', selectedData[0]);
+      alert('数据结構有误，无法获取ID');
+      return;
+    }
+    
+    console.log('8. 准备触发 batchDelete 事件');
+    emit('batchDelete', selectedIds);
+    console.log('9. batchDelete 事件已触发，传递的ID:', selectedIds);
+    
+  } catch (error) {
+    console.error('批量删除处理出错:', error);
+    alert('批量删除处理失败: ' + error.message);
+  }
 };
 
 // 监听筛选状态变更，重置分页到第一页
@@ -367,7 +408,10 @@ const toggleColumns = computed(() =>
 defineExpose({
   clearSelection: () => {
     rowSelection.value = {};
-  }
+  },
+  // 暴露调试方法
+  getSelectedData: getSelectedRowsData,
+  getSelectionState: () => rowSelection.value
 });
 </script>
 

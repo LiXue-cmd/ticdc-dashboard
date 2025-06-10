@@ -18,6 +18,7 @@
         { label: '启用', value: 'active' },
         { label: '禁用', value: 'inactive' },
       ]"
+      @batch-delete="handleBatchDelete"
     />
   </div>
 </template>
@@ -41,7 +42,7 @@ const filterColumns = ref([
 ]);
 const datakeymanage = ref<any[]>([
   {
-    invoice: "MK-2023001",
+    id: "MK-2023001",
     keyAlias: "系统默认密钥",
     algorithm: "AES-256",
     tags: "系统,默认",
@@ -51,7 +52,7 @@ const datakeymanage = ref<any[]>([
     status: "active",
   },
   {
-    invoice: "MK-2023002",
+    id: "MK-2023002",
     keyAlias: "用户数据加密",
     algorithm: "RSA-2048",
     tags: "用户,数据,加密",
@@ -61,7 +62,7 @@ const datakeymanage = ref<any[]>([
     status: "active",
   },
   {
-    invoice: "MK-2023003",
+    id: "MK-2023003",
     keyAlias: "API签名密钥",
     algorithm: "HMAC-SHA256",
     tags: "API,签名",
@@ -71,7 +72,7 @@ const datakeymanage = ref<any[]>([
     status: "inactive",
   },
   {
-    invoice: "MK-2023004",
+    id: "MK-2023004",
     keyAlias: "支付系统密钥",
     algorithm: "AES-128",
     tags: "支付,安全",
@@ -81,7 +82,7 @@ const datakeymanage = ref<any[]>([
     status: "active",
   },
   {
-    invoice: "MK-2023005",
+    id: "MK-2023005",
     keyAlias: "日志加密密钥",
     algorithm: "ChaCha20",
     tags: "日志,审计",
@@ -94,9 +95,9 @@ const datakeymanage = ref<any[]>([
 
 const columns: ColumnDef<any>[] = [
   {
-    accessorKey: "invoice",
+    accessorKey: "id",
     header: "密钥ID",
-    cell: ({ row }) => h("div", { class: "w-40" }, row.getValue("invoice")),
+    cell: ({ row }) => h("div", { class: "w-40" }, row.getValue("id")),
     // 允许排序和隐藏
     canSort: true,
     canHide: true,
@@ -169,13 +170,13 @@ const columns: ColumnDef<any>[] = [
           type: "action",
           label: "详情",
           icon: "i-radix-icons-pencil",
-          onClick: (task) => openDetailModal(task.invoice), // 修改为 task.invoice
+          onClick: (task) => openDetailModal(task.id), // 修改为 task.id
         },
         // {
         //   type: "action",
         //   label: "编辑",
         //   icon: "i-radix-icons-edit",
-        //   onClick: (task) => openEditModal(task.invoice), // 添加编辑功能
+        //   onClick: (task) => openEditModal(task.id), // 添加编辑功能
         // },
         // 根据当前状态显示启用或禁用按钮
         row.getValue("status") === "active"
@@ -217,15 +218,15 @@ onMounted(async () => {
   await loadMasterKeys();
 });
 
-const openDetailModal = (invoice: any) => {
+const openDetailModal = (id: any) => {
   // 这里可以添加打开详情弹窗的逻辑
-  console.log("Open detail modal for", invoice);
-  router.push(`/datakeymanage/details/${invoice}`);
+  console.log("Open detail modal for", id);
+  router.push(`/datakeymanage/details/${id}`);
 };
 
 const updateStatus = (task: any, targetStatus: string) => {
   const index = datakeymanage.value.findIndex(
-    (item) => item.invoice === task.invoice
+    (item) => item.id === task.id
   );
   if (index === -1) {
     console.error("未找到对应的密钥记录");
@@ -244,6 +245,88 @@ const updateStatus = (task: any, targetStatus: string) => {
     newTask,
     ...datakeymanage.value.slice(index + 1),
   ];
+};
+// 在 script setup 中添加的 handleBatchDelete 函数
+const handleBatchDelete = async (selectedRows: any[]) => {
+  if (!selectedRows || selectedRows.length === 0) {
+    toast({
+      title: "提示",
+      description: "请选择要删除的数据密钥",
+      variant: "default",
+    });
+    return;
+  }
+
+  // 检查是否有启用状态的密钥
+  const activeKeys = selectedRows.filter(row => row.status === 'active');
+  if (activeKeys.length > 0) {
+    toast({
+      title: "操作失败",
+      description: `选中的密钥中有 ${activeKeys.length} 个处于启用状态，请先禁用后再删除`,
+      variant: "destructive",
+    });
+    return;
+  }
+
+  // 检查是否有系统关键密钥（可根据实际业务需求调整判断条件）
+  const systemKeys = selectedRows.filter(row => 
+    row.tags?.includes('系统') || row.keyAlias?.includes('系统')
+  );
+  if (systemKeys.length > 0) {
+    toast({
+      title: "操作失败", 
+      description: `选中的密钥中包含系统关键密钥，不允许删除`,
+      variant: "destructive",
+    });
+    return;
+  }
+
+  try {
+    // 获取要删除的密钥ID列表
+    const idsToDelete = selectedRows.map(row => row.id);
+    
+    console.log("准备删除的密钥ID:", idsToDelete);
+
+    // 调用后端API进行批量删除
+    // 注释掉的部分是实际API调用，现在使用模拟删除
+    /*
+    const { data, error } = await useFetch("/api/cdc/datakeymanage/batch-delete", {
+      method: "POST",
+      body: {
+        ids: idsToDelete
+      }
+    });
+
+    if (error.value) {
+      throw new Error(error.value.message || "删除失败");
+    }
+    */
+
+    // 模拟API调用延迟
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // 从本地数据中移除已删除的项目
+    datakeymanage.value = datakeymanage.value.filter(
+      item => !idsToDelete.includes(item.id)
+    );
+
+    toast({
+      title: "删除成功",
+      description: `成功删除 ${selectedRows.length} 个数据密钥`,
+      variant: "default",
+    });
+
+    console.log("批量删除操作完成");
+
+  } catch (error) {
+    console.error("批量删除失败:", error);
+    
+    toast({
+      title: "删除失败",
+      description: error instanceof Error ? error.message : "删除过程中发生未知错误",
+      variant: "destructive",
+    });
+  }
 };
 </script>
 
