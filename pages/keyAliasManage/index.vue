@@ -13,6 +13,7 @@
       addTaskRoute="/keyaliasmanage/create"
       addTaskText="新增密钥别名"
       @batch-delete="handleBatchDelete"
+      :hideBatchDelete="false"
     />
      <!-- 删除确认对话框 -->
     <Dialog :open="isDeleteModalOpen" @update:open="closeDeleteModal">

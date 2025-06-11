@@ -18,6 +18,7 @@
       addTaskRoute="/tags/create"
       addTaskText="新增标签"
       @batch-delete="handleBatchDelete"
+      :hideBatchDelete="false"
     />
 
     <!-- 单个删除确认对话框 -->

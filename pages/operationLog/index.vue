@@ -100,25 +100,21 @@ const columns: ColumnDef<any>[] = [
     accessorKey: "timestamp",
     header: "操作时间",
     cell: ({ row }) => h("div", { class: "w-45" }, row.getValue("timestamp")),
-    canSort: true,
   },
   {
     accessorKey: "operator",
     header: "操作人",
     cell: ({ row }) => row.getValue("operator") || "-",
-    canSort: true,
   },
   {
     accessorKey: "operation",
     header: "操作类型",
     cell: ({ row }) => row.getValue("operation") || "-",
-    canSort: true,
   },
   {
     accessorKey: "resource",
     header: "操作资源",
     cell: ({ row }) => row.getValue("resource") || "-",
-    canSort: true,
   },
   {
     accessorKey: "status",
@@ -135,13 +131,11 @@ const columns: ColumnDef<any>[] = [
         status === "success" ? "成功" : "失败"
       );
     },
-    canSort: true,
   },
   {
     accessorKey: "notes",
     header: "备注",
     cell: ({ row }) => h("div", { class: "max-w-[400px] overflow-ellipsis" }, row.getValue("notes") || "-"),
-    canHide: true,
   },
 ];
 
@@ -156,7 +150,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.max-w-[400px] { max-width: 400px; }
 .overflow-ellipsis { 
   overflow: hidden; 
   text-overflow: ellipsis; 

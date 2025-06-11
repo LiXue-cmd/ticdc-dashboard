@@ -19,6 +19,7 @@
       no-data-text="暂无用户数据"
       addTaskRoute="/usermanage/create"
       addTaskText="新增用户"
+      :hideBatchDelete="false"
     />
 
     <!-- 删除确认对话框 -->

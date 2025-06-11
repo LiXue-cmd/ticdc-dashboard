@@ -23,6 +23,7 @@
       :statusFilterField="'status'"
       :statusOptions="statusOptions"
       @batch-delete="handleBatchDelete"
+      :hideBatchDelete="false"
     />
 
     <!-- 删除确认对话框 -->

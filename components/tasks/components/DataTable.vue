@@ -60,7 +60,7 @@
       <div class="flex items-center space-x-2">
         <!-- 批量删除按钮 -->
         <Button
-          v-if="selectedRowsCount > 0"
+          v-if="selectedRowsCount > 0 && !hideBatchDelete"
           variant="destructive"
           size="sm"
           class="h-8"
@@ -214,6 +214,8 @@ interface DataTableProps {
   // 新增：状态筛选相关Props
   statusFilterField?: string; // 状态字段名（如 'status'）
   statusOptions?: { label: string; value: string }[]; // 状态选项列表
+  // 新增：隐藏批量删除按钮
+  hideBatchDelete?: boolean;
 }
 
 const props = withDefaults(defineProps<DataTableProps>(), {
@@ -222,7 +224,8 @@ const props = withDefaults(defineProps<DataTableProps>(), {
   addTaskText: '新增',
   noDataText: 'No results.',
   statusFilterField: '',
-  statusOptions: () => []
+  statusOptions: () => [],
+  hideBatchDelete: true // 默认隐藏批量删除按钮
 });
 
 // 定义事件
