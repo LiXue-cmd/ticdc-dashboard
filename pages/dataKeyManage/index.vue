@@ -283,7 +283,8 @@ const handleBatchDelete = async (selectedRows: any[]) => {
 
   try {
     // 获取要删除的密钥ID列表
-    const idsToDelete = selectedRows.map(row => row.id);
+    const idsToDelete = selectedRows.map(row => row);
+    // const idsToDelete = selectedRows.map(row => row.id);
     
     console.log("准备删除的密钥ID:", idsToDelete);
 

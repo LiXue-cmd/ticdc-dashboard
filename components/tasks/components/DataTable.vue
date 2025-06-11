@@ -64,7 +64,7 @@
           variant="destructive"
           size="sm"
           class="h-8"
-          @click="handleBatchDelete"
+          @click="showBatchDeleteConfirm"
         >
           <Icon name="i-radix-icons-trash" class="mr-2 h-4 w-4" />
           批量删除 ({{ selectedRowsCount }})
@@ -155,6 +155,31 @@
     </div>
     <!-- 分页组件 -->
     <DataTablePagination :table="table" />
+
+    <!-- 批量删除确认对话框 -->
+    <Dialog :open="isBatchDeleteModalOpen" @update:open="closeBatchDeleteModal">
+      <DialogContent class="w-96 -translate-x-1/2! -translate-y-1/2!">
+        <DialogTitle class="text-lg font-medium">确认批量删除</DialogTitle>
+        <DialogDescription class="mt-2 text-muted-foreground">
+          确定要删除选中的 <strong class="text-red-600">{{ selectedRowsCount }}</strong> 个项目吗？<br />
+          此操作不可撤销，且可能会影响关联的资源。
+        </DialogDescription>
+
+        <div class="mt-4 flex justify-end gap-2">
+          <Button variant="outline" @click="closeBatchDeleteModal">
+            取消
+          </Button>
+          <Button 
+            variant="destructive" 
+            @click="confirmBatchDelete"
+            :disabled="isBatchDeleting"
+          >
+            <Icon v-if="isBatchDeleting" name="i-radix-icons-update" class="mr-2 h-4 w-4 animate-spin" />
+            删除 {{ selectedRowsCount }} 个项目
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   </div>
 </template>
 
@@ -208,6 +233,10 @@ const emit = defineEmits<{
 // 组件内响应式状态
 const filterStatus = ref<string | undefined>("all"); // 当前筛选状态
 const isStatusFilterEnabled = computed(() => !!props.statusFilterField); // 是否启用状态筛选
+
+// 批量删除相关状态
+const isBatchDeleteModalOpen = ref(false);
+const isBatchDeleting = ref(false);
 
 const sorting = ref<SortingState>([]);
 const columnFilters = ref<ColumnFiltersState>([]);
@@ -302,33 +331,39 @@ const selectedRowsCount = computed(() => {
   return Object.keys(rowSelection.value).length;
 });
 
-// 获取选中的行数据 - 修复版本
+// 获取选中的行数据
 const getSelectedRowsData = () => {
   const selectedRows = table.getFilteredSelectedRowModel().rows;
   return selectedRows.map(row => row.original);
 };
 
-// 批量删除处理 - 增强版本
-const handleBatchDelete = () => {
+// 显示批量删除确认对话框
+const showBatchDeleteConfirm = () => {
   console.log('=== 批量删除调试信息 ===');
   console.log('1. 批量删除按钮被点击');
   console.log('2. 当前选中行数量:', selectedRowsCount.value);
-  console.log('3. rowSelection 对象:', JSON.stringify(rowSelection.value, null, 2));
-  console.log('4. 表格当前数据:', props.data);
+  
+  if (selectedRowsCount.value === 0) {
+    console.warn('没有选中任何行');
+    return;
+  }
+  
+  // 直接显示确认对话框
+  isBatchDeleteModalOpen.value = true;
+};
+
+// 确认批量删除
+const confirmBatchDelete = async () => {
+  console.log('3. 确认批量删除被点击');
   
   try {
-    // 检查是否有选中的行
-    if (selectedRowsCount.value === 0) {
-      console.warn('没有选中任何行');
-      alert('请先选择要删除的行');
-      return;
-    }
+    isBatchDeleting.value = true;
     
     const selectedRows = table.getFilteredSelectedRowModel().rows;
-    console.log('5. 选中的表格行对象:', selectedRows);
+    console.log('4. 选中的表格行对象:', selectedRows);
     
     const selectedData = selectedRows.map(row => row.original);
-    console.log('6. 选中的原始数据:', selectedData);
+    console.log('5. 选中的原始数据:', selectedData);
     
     // 尝试多种 ID 字段名
     const selectedIds = selectedData.map(item => {
@@ -337,23 +372,40 @@ const handleBatchDelete = () => {
       return id;
     }).filter(id => id !== undefined && id !== null);
     
-    console.log('7. 最终提取的 ID 列表:', selectedIds);
+    console.log('6. 最终提取的 ID 列表:', selectedIds);
     
     if (selectedIds.length === 0) {
       console.error('无法提取有效的 ID，请检查数据结构');
-      console.log('数据示例:', selectedData[0]);
-      alert('数据结構有误，无法获取ID');
       return;
     }
     
-    console.log('8. 准备触发 batchDelete 事件');
+    console.log('7. 准备触发 batchDelete 事件');
+    
+    // 触发父组件的批量删除事件
     emit('batchDelete', selectedIds);
-    console.log('9. batchDelete 事件已触发，传递的ID:', selectedIds);
+    
+    // 关闭对话框并清空选择
+    closeBatchDeleteModal();
+    clearSelection();
+    
+    console.log('8. batchDelete 事件已触发，传递的ID:', selectedIds);
     
   } catch (error) {
     console.error('批量删除处理出错:', error);
-    alert('批量删除处理失败: ' + error.message);
+  } finally {
+    isBatchDeleting.value = false;
   }
+};
+
+// 关闭批量删除确认对话框
+const closeBatchDeleteModal = (open?: boolean) => {
+  isBatchDeleteModalOpen.value = typeof open === 'boolean' ? open : false;
+  isBatchDeleting.value = false;
+};
+
+// 清空选择状态
+const clearSelection = () => {
+  rowSelection.value = {};
 };
 
 // 监听筛选状态变更，重置分页到第一页
@@ -367,7 +419,7 @@ watch(
   () => {
     table.setPageIndex(0);
     // 清空选择状态
-    rowSelection.value = {};
+    clearSelection();
   },
   { deep: true }
 );
@@ -377,7 +429,7 @@ const resetFilters = () => {
   table.resetColumnFilters(); // 清除文本过滤
   filterStatus.value = "all"; // 重置状态筛选
   table.setPageIndex(0); // 重置分页到第一页
-  rowSelection.value = {}; // 清空选择状态
+  clearSelection(); // 清空选择状态
 };
 
 // 状态标签映射函数
@@ -404,12 +456,9 @@ const toggleColumns = computed(() =>
     )
 );
 
-// 暴露清空选择的方法给父组件
+// 暴露方法给父组件
 defineExpose({
-  clearSelection: () => {
-    rowSelection.value = {};
-  },
-  // 暴露调试方法
+  clearSelection,
   getSelectedData: getSelectedRowsData,
   getSelectionState: () => rowSelection.value
 });

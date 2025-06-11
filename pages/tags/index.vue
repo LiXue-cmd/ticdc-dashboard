@@ -17,9 +17,10 @@
       no-data-text="暂无标签数据"
       addTaskRoute="/tags/create"
       addTaskText="新增标签"
+      @batch-delete="handleBatchDelete"
     />
 
-    <!-- 删除确认对话框 -->
+    <!-- 单个删除确认对话框 -->
     <Dialog :open="isDeleteModalOpen" @update:open="closeDeleteModal">
       <DialogContent class="w-80 -translate-x-1/2! -translate-y-1/2!">
         <DialogTitle class="text-lg font-medium">确认删除</DialogTitle>
@@ -80,9 +81,10 @@ const tags = ref<any[]>([
   },
 ]);
 
-// 删除相关状态
+// 单个删除相关状态
 const isDeleteModalOpen = ref(false);
 const deletingTag = ref<any>({});
+
 const filterColumns = ref([{ accessorKey: "name", header: "标签名称" }]);
 
 // 计算属性：过滤后的数据
@@ -97,7 +99,7 @@ const columns: ColumnDef<any>[] = [
   {
     accessorKey: "id",
     header: "ID",
-    cell: ({ row }) => h("div", { class: "w-16 text-right" }, row.getValue("id")),
+    cell: ({ row }) => h("div", { class: "w-16" }, row.getValue("id")),
   },
   {
     accessorKey: "name",
@@ -146,7 +148,7 @@ const columns: ColumnDef<any>[] = [
 
 // 生命周期钩子
 onMounted(() => {
-  loadTags();
+  // loadTags();
 });
 
 // 数据加载
@@ -176,14 +178,13 @@ const editTag = (id: number) => {
   router.push(`/tags/edit/${id}`);
 };
 
-// 删除流程
+// 单个删除流程
 const showDeleteConfirm = (tag: any) => {
   deletingTag.value = tag;
   isDeleteModalOpen.value = true;
 };
 
 const closeDeleteModal = (open?: boolean) => {
-  // 如果传入参数，使用参数值；否则设为 false
   isDeleteModalOpen.value = typeof open === 'boolean' ? open : false;
   deletingTag.value = {};
 };
@@ -219,7 +220,54 @@ const handleDeleteTag = async () => {
       variant: "destructive",
     });
   }
-}
+};
+
+// 批量删除处理函数 - 简化版本，只处理API调用
+const handleBatchDelete = async (selectedIds: number[]) => {
+  console.log("收到批量删除请求，选中的ID:",  );
+  
+  if (!selectedIds || selectedIds.length === 0) {
+    toast({
+      title: "请选择要删除的标签",
+      description: "至少选择一个标签进行删除操作",
+      variant: "destructive",
+    });
+    return;
+  }
+
+  try {
+    // 批量删除 API 请求
+    const { error } = await useFetch("/api/tags/batch-delete", {
+      method: "DELETE",
+      body: {
+        ids: selectedIds
+      },
+    });
+
+    if (error?.value) {
+      toast({
+        title: "批量删除失败",
+        description: error.value.statusMessage || "删除过程中发生错误",
+        variant: "destructive",
+      });
+    } else {
+      // 从本地数据中移除已删除的标签
+      tags.value = tags.value.filter(tag => !selectedIds.includes(tag.id));
+      
+      toast({
+        description: `成功删除 ${selectedIds.length} 个标签！`,
+        variant: "default",
+      });
+    }
+  } catch (error) {
+    console.error("批量删除失败:", error);
+    toast({
+      title: "系统错误",
+      description: "批量删除请求处理失败",
+      variant: "destructive",
+    });
+  }
+};
 </script>
 
 <style scoped>

@@ -12,6 +12,7 @@
       :filterColumns="filterColumns"
       addTaskRoute="/keyaliasmanage/create"
       addTaskText="新增密钥别名"
+      @batch-delete="handleBatchDelete"
     />
      <!-- 删除确认对话框 -->
     <Dialog :open="isDeleteModalOpen" @update:open="closeDeleteModal">
@@ -56,31 +57,31 @@ const filterColumns = ref([
 ]);
 const keyaliasmanage = ref<any[]>([
   {
-    invoice: "MK-2023001",
+    id: "MK-2023001",
     keyAlias: "系统默认密钥",
     createDate: "2023-06-15",
     updateDate: "2023-06-15",
   },
   {
-    invoice: "MK-2023002",
+    id: "MK-2023002",
     keyAlias: "用户数据加密",
     createDate: "2023-07-22",
     updateDate: "2023-06-15",
   },
   {
-    invoice: "MK-2023003",
+    id: "MK-2023003",
     keyAlias: "API签名密钥",
     createDate: "2023-08-05",
     updateDate: "2023-06-15",
   },
   {
-    invoice: "MK-2023004",
+    id: "MK-2023004",
     keyAlias: "支付系统密钥",
     createDate: "2023-09-10",
     updateDate: "2023-06-15",
   },
   {
-    invoice: "MK-2023005",
+    id: "MK-2023005",
     keyAlias: "日志加密密钥",
     createDate: "2023-10-15",
     updateDate: "2023-06-15",
@@ -89,9 +90,9 @@ const keyaliasmanage = ref<any[]>([
 
 const columns: ColumnDef<any>[] = [
   {
-    accessorKey: "invoice",
+    accessorKey: "id",
     header: "密钥ID",
-    cell: ({ row }) => h("div", { class: "w-40" }, row.getValue("invoice")),
+    cell: ({ row }) => h("div", { class: "w-40" }, row.getValue("id")),
     // 允许排序和隐藏
     canSort: true,
     canHide: true,
@@ -127,7 +128,7 @@ const columns: ColumnDef<any>[] = [
           type: "action",
           label: "关联密钥",
           icon: "i-radix-icons-edit",
-          onClick: (task) => openEditModal(task.invoice), // 添加编辑功能
+          onClick: (task) => openEditModal(task.id), // 添加编辑功能
         },
         {
           type: "action",
@@ -161,11 +162,11 @@ onMounted(async () => {
 });
 
 // 关联密钥
-const openEditModal = (invoice: any) => {
+const openEditModal = (id: any) => {
   // 这里可以添加打开详情弹窗的逻辑
-  console.log("Open detail modal for", invoice);
-  router.push(`/keyaliasmanage/association/${invoice}`);
-  // router.push({ name: 'keyaliasmanage/association', params: { id: invoice } });
+  console.log("Open detail modal for", id);
+  router.push(`/keyaliasmanage/association/${id}`);
+  // router.push({ name: 'keyaliasmanage/association', params: { id: id } });
 };
 
 // 打开删除确认弹窗
@@ -183,11 +184,11 @@ const closeDeleteModal = (open?: boolean) => {
 
 // 确认删除操作
 async function handleConfirmDelete() {
-  const { invoice } = deletingItem.value;
-  if (!invoice) return;
+  const { id } = deletingItem.value;
+  if (!id) return;
 
   try {
-    const { error } = await useFetch(`/api/cdc/deleteMasterKey/${invoice}`, {
+    const { error } = await useFetch(`/api/cdc/deleteMasterKey/${id}`, {
       method: "DELETE",
     });
 
@@ -199,7 +200,7 @@ async function handleConfirmDelete() {
       });
     } else {
       keyaliasmanage.value = keyaliasmanage.value.filter(
-        (item) => item.invoice !== invoice
+        (item) => item.id !== id
       );
       toast({
         description: "密钥别名已成功删除！",
@@ -221,6 +222,88 @@ async function handleConfirmDelete() {
 const closeCreateModal = () => {
   // 实际项目中需要实现关闭模态框的逻辑
   console.log("Close create modal");
+};
+const handleBatchDelete = async (selectedRows: any[]) => {
+  if (!selectedRows || selectedRows.length === 0) {
+    toast({
+      title: "提示",
+      description: "请选择要删除的密钥别名",
+      variant: "default",
+    });
+    return;
+  }
+
+  // 检查是否有启用状态的密钥
+  const activeKeys = selectedRows.filter(row => row.status === 'active');
+  if (activeKeys.length > 0) {
+    toast({
+      title: "操作失败",
+      description: `选中的密钥中有 ${activeKeys.length} 个处于启用状态，请先禁用后再删除`,
+      variant: "destructive",
+    });
+    return;
+  }
+
+  // 检查是否有系统关键密钥（可根据实际业务需求调整判断条件）
+  const systemKeys = selectedRows.filter(row => 
+    row.tags?.includes('系统') || row.keyAlias?.includes('系统')
+  );
+  if (systemKeys.length > 0) {
+    toast({
+      title: "操作失败", 
+      description: `选中的密钥中包含系统关键密钥，不允许删除`,
+      variant: "destructive",
+    });
+    return;
+  }
+  console.log("开始批量删除操作，选中的密钥数量:", selectedRows);
+  try {
+    // 获取要删除的密钥ID列表
+    const idsToDelete = selectedRows.map(row => row);
+    // const idsToDelete = selectedRows.map(row => row.id);
+    
+    console.log("准备删除的密钥ID:", idsToDelete);
+
+    // 调用后端API进行批量删除
+    // 注释掉的部分是实际API调用，现在使用模拟删除
+    /*
+    const { data, error } = await useFetch("/api/cdc/datakeymanage/batch-delete", {
+      method: "POST",
+      body: {
+        ids: idsToDelete
+      }
+    });
+
+    if (error.value) {
+      throw new Error(error.value.message || "删除失败");
+    }
+    */
+
+    // 模拟API调用延迟
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // 从本地数据中移除已删除的项目
+    keyaliasmanage.value = keyaliasmanage.value.filter(
+      item => !idsToDelete.includes(item.id)
+    );
+
+    toast({
+      title: "删除成功",
+      description: `成功删除 ${selectedRows.length} 个密钥别名`,
+      variant: "default",
+    });
+
+    console.log("批量删除操作完成");
+
+  } catch (error) {
+    console.error("批量删除失败:", error);
+    
+    toast({
+      title: "删除失败",
+      description: error instanceof Error ? error.message : "删除过程中发生未知错误",
+      variant: "destructive",
+    });
+  }
 };
 </script>
 
