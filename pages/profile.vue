@@ -145,7 +145,16 @@ definePageMeta({
 })
 
 const { user, logout, refreshSession: refreshAuthSession } = useAuthStore()
-const profile = ref(null)
+interface Profile {
+  avatar?: string
+  username?: string
+  email?: string
+  role?: string
+  createdAt?: string | Date
+  lastLogin?: string | Date
+}
+
+const profile = ref<Profile>({})
 const loading = ref(true)
 const refreshing = ref(false)
 
@@ -156,8 +165,8 @@ const formatDate = (date: Date | string | undefined) => {
 
 const tokenExpiry = computed(() => {
   // Assume token expires in 24 hours from last refresh
-  if (user.value?.lastLogin) {
-    const expiryTime = new Date(user.value.lastLogin)
+  if (profile.value?.lastLogin) {
+    const expiryTime = new Date(profile.value.lastLogin as string)
     expiryTime.setHours(expiryTime.getHours() + 24)
     return expiryTime.toLocaleString()
   }

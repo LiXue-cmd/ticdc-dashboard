@@ -95,28 +95,28 @@ const columns: ColumnDef<any>[] = [
     header: "密钥ID",
     cell: ({ row }) => h("div", { class: "w-40" }, row.getValue("id")),
     // 允许排序和隐藏
-    canSort: true,
+    // canSort: true,
     canHide: true,
   },
   {
     accessorKey: "keyAlias",
     header: "密钥别名",
     cell: ({ row }) => row.getValue("keyAlias") || "-",
-    canSort: true,
+    // canSort: true,
     canHide: true,
   },
   {
     accessorKey: "createDate",
     header: "创建日期",
     cell: ({ row }) => row.getValue("createDate") || "-",
-    canSort: true, // 支持按日期排序
+    // canSort: true, // 支持按日期排序
     canHide: true,
   },
   {
     accessorKey: "updateDate",
     header: "更新日期",
     cell: ({ row }) => row.getValue("updateDate") || "-",
-    canSort: true, // 支持按日期排序
+    // canSort: true, // 支持按日期排序
     canHide: true,
   },
   {
