@@ -14,7 +14,7 @@
     <DataTable
       ref="dataTable"
       :columns="columns"
-      :data="filteredTags"
+      :data="filteredAppmanages"
       :filterColumns="filterColumns"
       :is-loading="isLoading"
       no-data-text="暂无应用数据"
@@ -43,26 +43,7 @@
       </DialogContent>
     </Dialog>
 
-    <!-- 批量删除确认对话框 -->
-    <Dialog :open="isBatchDeleteModalOpen" @update:open="closeBatchDeleteModal">
-      <DialogContent class="w-96 -translate-x-1/2! -translate-y-1/2!">
-        <DialogTitle class="text-lg font-medium">确认批量删除</DialogTitle>
-        <DialogDescription class="mt-2 text-muted-foreground">
-          确定要删除选中的 <strong class="text-gray-900">{{ batchDeleteIds.length }}</strong> 个应用吗？<br />
-          <span class="text-sm text-gray-600 mt-2 block">
-            包括：{{ getBatchDeleteNames() }}
-          </span><br />
-          此操作不可撤销，且会影响关联的所有资源。
-        </DialogDescription>
-
-        <div class="mt-4 flex justify-end gap-2">
-          <Button variant="outline" @click="closeBatchDeleteModal"> 取消 </Button>
-          <Button variant="destructive" @click="confirmBatchDelete"> 
-            删除 {{ batchDeleteIds.length }} 个应用
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+    <!-- 批量删除确认对话框已移除 -->
 
     <!-- 重置AppSecret确认对话框 -->
     <Dialog :open="isResetModalOpen" @update:open="closeResetModal">
@@ -140,10 +121,6 @@ const appmanage = ref<any[]>([
 const isDeleteModalOpen = ref(false);
 const deletingTag = ref<any>({});
 
-// 批量删除相关状态
-const isBatchDeleteModalOpen = ref(false);
-const batchDeleteIds = ref<any[]>([]);
-
 // 重置AppSecret相关状态
 const isResetModalOpen = ref(false);
 const resettingApp = ref<any>({});
@@ -157,7 +134,7 @@ const statusOptions = ref([
 const filterColumns = ref([{ accessorKey: "name", header: "应用名称" }]);
 
 // 计算属性：过滤后的数据
-const filteredTags = computed(() => {
+const filteredAppmanages = computed(() => {
   return appmanage.value.filter((tag) =>
     tag.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
@@ -264,11 +241,11 @@ const columns: ColumnDef<any>[] = [
 
 // 生命周期钩子
 onMounted(() => {
-  loadTags();
+  loadAppmanages();
 });
 
 // 数据加载
-async function loadTags() {
+async function loadAppmanages() {
   isLoading.value = true;
   try {
     // 注释掉API调用，使用模拟数据
@@ -333,69 +310,6 @@ const handleDeleteTag = async () => {
   }
 };
 
-// 批量删除流程
-const handleBatchDelete = (selectedIds: any[]) => {
-  if (selectedIds.length === 0) {
-    toast({
-      title: "提示",
-      description: "请选择要删除的应用",
-      variant: "default",
-    });
-    return;
-  }
-  batchDeleteIds.value = selectedIds;
-  isBatchDeleteModalOpen.value = true;
-};
-
-const closeBatchDeleteModal = () => {
-  isBatchDeleteModalOpen.value = false;
-  batchDeleteIds.value = [];
-};
-
-const getBatchDeleteNames = () => {
-  const names = batchDeleteIds.value
-    .map(id => {
-      const app = appmanage.value.find(item => item.id === id);
-      return app?.name;
-    })
-    .filter(name => name)
-    .slice(0, 3);
-  
-  const result = names.join('、');
-  if (batchDeleteIds.value.length > 3) {
-    return result + ' 等';
-  }
-  return result;
-};
-
-const confirmBatchDelete = async () => {
-  try {
-    // 模拟批量删除成功
-    appmanage.value = appmanage.value.filter(
-      (app) => !batchDeleteIds.value.includes(app.id)
-    );
-
-    toast({
-      description: `成功删除 ${batchDeleteIds.value.length} 个应用！`,
-      variant: "default",
-    });
-
-    // 清空选择状态
-    if (dataTable.value) {
-      dataTable.value.clearSelection();
-    }
-
-    closeBatchDeleteModal();
-  } catch (error) {
-    console.error("批量删除失败:", error);
-    toast({
-      title: "删除失败",
-      description: "批量删除时发生错误",
-      variant: "destructive",
-    });
-  }
-};
-
 // 重置AppSecret流程
 const showResetConfirm = (app: any) => {
   resettingApp.value = app;
@@ -453,6 +367,52 @@ const updateStatus = (task: any, targetStatus: string) => {
     description: `应用状态已更新为${targetStatus === 'active' ? '启用' : '禁用'}！`,
     variant: "default",
   });
+};
+// 批量删除处理函数 - 简化版本，只处理API调用
+const handleBatchDelete = async (selectedIds: number[]) => {
+  console.log("收到批量删除请求，选中的ID:",  );
+  
+  if (!selectedIds || selectedIds.length === 0) {
+    toast({
+      title: "请选择要删除的标签",
+      description: "至少选择一个标签进行删除操作",
+      variant: "destructive",
+    });
+    return;
+  }
+
+  try {
+    // 批量删除 API 请求
+    const { error } = await useFetch("/api/appmanage/batch-delete", {
+      method: "DELETE",
+      body: {
+        ids: selectedIds
+      },
+    });
+
+    if (error?.value) {
+      toast({
+        title: "批量删除失败",
+        description: error.value.statusMessage || "删除过程中发生错误",
+        variant: "destructive",
+      });
+    } else {
+      // 从本地数据中移除已删除的标签
+      appmanage.value = appmanage.value.filter(tag => !selectedIds.includes(tag.id));
+      
+      toast({
+        description: `成功删除 ${selectedIds.length} 个标签！`,
+        variant: "default",
+      });
+    }
+  } catch (error) {
+    console.error("批量删除失败:", error);
+    toast({
+      title: "系统错误",
+      description: "批量删除请求处理失败",
+      variant: "destructive",
+    });
+  }
 };
 </script>
 
