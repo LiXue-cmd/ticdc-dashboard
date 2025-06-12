@@ -57,7 +57,7 @@ import { useFetch } from "#app";
 
 const router = useRouter();
 const route = useRoute();
-const toast = useToast();
+const { toast } = useToast();
 const isLoading = ref(false);
 
 // 表单数据

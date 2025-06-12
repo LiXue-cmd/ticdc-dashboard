@@ -59,7 +59,7 @@ import { useFetch } from "#app";
 // import { Button, Input, Textarea } from "@/components/ui/dialog";
 
 const router = useRouter();
-const toast = useToast();
+const { toast } = useToast();
 const isLoading = ref(false);
 
 // 表单数据
